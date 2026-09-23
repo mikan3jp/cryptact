@@ -217,9 +217,9 @@ button:disabled{cursor:not-allowed}
       <button class="chip" data-amt="10">10 XRP</button>
       <label class="chip-other">その他 <input id="tipOther" inputmode="decimal" placeholder="例 3"> XRP</label>
     </div>
-    <p class="mobile-only" style="margin:0 0 8px">スマホの場合：下の「アドレスをコピー」を押して、Xamanなどウォレットアプリの送金画面に貼り付けてください（Xamanはコピーしたアドレスの貼り付けを自動で提案します）。</p>
-    <div class="tip-wallets desktop-only">
-      <button class="wbtn" id="tipXaman" hidden>Xamanで送る</button>
+    <p class="mobile-only" id="mobileTip" style="margin:0 0 8px"></p>
+    <div class="tip-wallets"><button class="wbtn" id="tipXaman" hidden>Xamanで送る</button></div>
+    <div class="tip-wallets desktop-only" style="margin-top:8px">
       <button class="wbtn" id="tipGem">GemWalletで送る</button>
       <button class="wbtn" id="tipCross">Crossmarkで送る</button>
     </div>
@@ -1385,6 +1385,10 @@ function renderTip() {
       ? '金額入りQRは 1・5・10 XRP のみ対応のため、アドレスのみのQRを表示しています。読み取ったあと金額を入力してください。'
       : 'どのウォレット・取引所アプリでも読み取れる、アドレスだけのQRです。金額は送金画面で入力してください。';
   $('tipXaman').hidden = !XAMAN_API_KEY;
+  const amtTxt = tipDrops() ? `${tipState.amt} XRP` : '金額';
+  $('mobileTip').textContent = XAMAN_API_KEY
+    ? `スマホの場合：「Xamanで送る」を押すと、${amtTxt}の送金リクエストがXamanアプリに届きます。その他のウォレットは、下の「アドレスをコピー」を押して送金画面に貼り付け、${amtTxt}を入力してください。`
+    : `スマホの場合：下の「アドレスをコピー」を押し、Xamanなどウォレットアプリの送金画面で宛先に貼り付けて、${amtTxt}を入力してください。`;
 }
 const txLink = h => h ? `<a href="https://xrpscan.com/tx/${esc(h)}" target="_blank" rel="noopener">取引を確認</a>` : '';
 const thanks = h => setTipMsg(`送金ありがとうございます！ ${txLink(h)}`, 'ok');
