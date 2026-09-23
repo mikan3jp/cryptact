@@ -77,11 +77,11 @@ button:disabled{cursor:not-allowed}
     <h2>免責事項（ご利用前に必ずお読みください）</h2>
     <div class="disc-body">
       <ol>
-        <li><b>非公式ツールです。</b>本ツールは個人が作成した非公式のツールであり、Ripple社、XRP Ledger Foundation、クリプタクト（株式会社pafin）、bitbank、CryptoCompare、その他いかなる事業者とも関係がなく、これらの承認・保証を受けたものではありません。</li>
+        <li><b>非公式ツールです。</b>本ツールは個人が作成した非公式のツールであり、Ripple社、XRP Ledger Foundation、クリプタクト（株式会社pafin）、bitbank、CoinGecko、Binance、Frankfurter、その他いかなる事業者とも関係がなく、これらの承認・保証を受けたものではありません。</li>
         <li><b>税務・会計・法律の助言ではありません。</b>本ツールおよび出力内容は情報提供を目的とするものであり、税務相談・税務代理・税務書類の作成その他の専門的助言を行うものではありません。暗号資産・NFT・DeFi（DEX、AMM、流動性提供等）の税務上の取扱いには明確な指針がない部分があり、本ツールの分類方法（交換、流動性提供の差損益、NFTのミント、送受金の除外・BONUS扱い等）は作成者の解釈に基づく一例にすぎません。申告内容の最終判断は、必ずご自身の責任で、税理士または所轄の税務署にご確認ください。</li>
-        <li><b>円単価の自動推定はあくまで推定値です。</b>「円単価を自動推定」で入力される価格は、取引時点のAMMプール比率・DEXの板の仲値・利用者自身の近い日付の取引、および外部サービスのXRP/円の日足終値を組み合わせて算出した近似値です。実際の取引価格、税務上の時価、クリプタクトが参照する時価とは異なる場合があり、流動性の低い相場、価格差の大きい板、意図的に操作された相場、日中の価格変動等により大きく乖離することがあります。推定値を利用するかどうか、どの価格を時価とするかは利用者ご自身の判断と責任で決定してください。</li>
+        <li><b>円単価の自動推定はあくまで推定値です。</b>「円単価を自動推定」で入力される価格は、取引時点のAMMプール比率・DEXの板の仲値・利用者自身の近い日付の取引、および外部サービス（bitbank・CoinGecko・Binance・Frankfurter）のXRP/円の日足終値等を組み合わせて算出した近似値です。実際の取引価格、税務上の時価、クリプタクトが参照する時価とは異なる場合があり、流動性の低い相場、価格差の大きい板、意図的に操作された相場、日中の価格変動等により大きく乖離することがあります。推定値を利用するかどうか、どの価格を時価とするかは利用者ご自身の判断と責任で決定してください。</li>
         <li><b>出力内容の正確性・完全性を保証しません。</b>取引の取得漏れ・重複、分類の誤り、数量・価格の計算誤差や端数処理、想定していない取引形態（トークン発行者のアドレス、エスクロー、ペイメントチャネル、クローバック、複合的な取引等）による誤った出力が含まれる可能性があります。出力されたCSVは、アップロード前に必ずご自身で全件確認・修正してください。</li>
-        <li><b>外部データに依存します。</b>取引履歴はXRPLの公開ノード、XRP/円の価格はbitbankまたはCryptoCompareの公開データから取得しています。これらのデータの誤り・欠落・遅延、サービスの停止・仕様変更・利用制限、ノードが保持する履歴の範囲により、結果が不正確または不完全になることがあります。</li>
+        <li><b>外部データに依存します。</b>取引履歴はXRPLの公開ノード、XRP/円の価格はbitbank・CoinGecko・Binance・Frankfurterの公開データから取得しています。これらのデータの誤り・欠落・遅延、サービスの停止・仕様変更・利用制限、ノードが保持する履歴の範囲により、結果が不正確または不完全になることがあります。</li>
         <li><b>クリプタクトでの取込み・計算結果を保証しません。</b>クリプタクトの仕様（カスタムファイルの形式、取引種類、カスタムコイン、価格参照、計算方法等）は変更されることがあり、本ツールの出力がアップロードできない、または意図と異なる計算結果になる場合があります。</li>
         <li><b>入力内容の保存について。</b>アドレス・設定・手入力した価格・推定値等は、利用中のブラウザ内（localStorage）にのみ保存され、外部には送信されません。ただし、ブラウザの設定やデータ削除により消失する場合や、共用端末では他の利用者に閲覧される場合があります。</li>
         <li><b>損害について一切の責任を負いません。</b>本ツールの利用または利用できなかったことにより生じたいかなる損害（申告誤り、修正申告・更正、過少申告加算税・無申告加算税・重加算税・延滞税等の負担、税理士等への費用、逸失利益、データの消失を含みますが、これらに限りません）についても、作成者は一切の責任を負いません。</li>
@@ -170,7 +170,7 @@ button:disabled{cursor:not-allowed}
       <button class="sec" id="estBtn" title="価格が未入力の行を、XRPL上の相場とXRP/円の日足から推定して埋めます">円単価を自動推定</button>
       <button id="dlBtn">CSVをダウンロード</button>
     </div>
-    <div id="estStatus" class="status" style="margin:-4px 0 10px"></div>
+    <div id="estStatus" class="status" style="margin:-4px 0 10px;white-space:pre-line"></div>
     <p class="muted" style="margin:-4px 0 10px">※「推定」の印が付いた円単価は近似値です。実際の時価と異なる場合があります（<a href="#disclaimer">免責事項</a>）。出力内容はアップロード前に必ずご自身で確認してください。</p>
     <p class="muted" style="margin:-4px 0 10px">※クリプタクトは二重計上防止のため、カスタムファイルを追加でアップすると<b>すでに取り込まれた最新の日時より後の取引しか取り込みません</b>。古い期間から順にアップしてください。修正したCSVをアップし直すときは、先にクリプタクト上で前回アップ分を削除してください。</p>
     <div class="tbl"><table>
@@ -196,7 +196,7 @@ button:disabled{cursor:not-allowed}
         <li>表で入力した価格・種類、トークン名、既定の単価は、このブラウザにアドレスごとに保存され、次回取得時に自動で復元されます（外部には送信しません）。</li>
         <li>NFT: 購入=BUY、売却=SELL、ミント=手数料を取得価額としたBUY。名称は USER-NFT-発行者-連番 です。</li>
         <li>単純な送受金は既定で除外（自己送金とみなす）。トークン・NFTの受取は既定でBONUS。表の「種類」から1件ずつ変更できます。</li>
-        <li>「円単価を自動推定」：価格が未入力の行を「その時点のトークンのXRP建て価格 × その日のXRP/円終値」で埋めます。XRP建て価格は、取引時点のレジャーのAMMプール比率 → 板の仲値 → 30日以内の自分のXRP建て取引の順に探します。XRP/円はbitbank（取れない場合はCryptoCompare）の日足終値です。推定の根拠はCSVのコメント欄に残ります。あくまで推定値なので、大きな金額の行は確認してください。</li>
+        <li>「円単価を自動推定」：価格が未入力の行を「その時点のトークンのXRP建て価格 × その日のXRP/円終値」で埋めます。XRP建て価格は、取引時点のレジャーのAMMプール比率 → 板の仲値 → 30日以内の自分のXRP建て取引の順に探します。XRP/円はbitbankの日足終値を使い、取得できない日はCoinGecko（直近365日）、Binance XRP/USDT×Frankfurter 米ドル/円の順で補います。推定の根拠はCSVのコメント欄に残ります。あくまで推定値なので、大きな金額の行は確認してください。</li>
         <li>クリプタクトへのアップ：カスタムファイルを追加でアップすると、すでに取り込まれた最新の日時より後の取引しか取り込まれません（クリプタクトの二重計上防止の仕様）。複数の期間に分けて出力した場合は古い期間から順にアップし、修正版をアップし直すときは前回アップ分をクリプタクト上で削除してから行ってください。</li>
         <li>カスタムコインのBONUS・SELL等は時価がクリプタクトに無いため、価格欄にJPY建ての1枚あたり価格を入力してください（空欄だと「価格データ欠落」になります）。</li>
         <li>自分がトークン発行者のアドレスや、エスクロー・ペイメントチャネルの細かな扱いは想定外の出力になる場合があります。</li>
@@ -965,55 +965,111 @@ const numStr = x => {
 };
 const shortNum = x => x >= 1 ? String(+x.toPrecision(6)) : String(+x.toPrecision(4));
 
-// XRP/円の日足（bitbank → だめなら CryptoCompare）
-async function loadXrpJpy(times) {
-  const candles = [];
-  const years = [...new Set(times.map(t => new Date(t + 9 * 3600e3).getUTCFullYear()))];
-  let src = 'bitbank';
-  try {
-    for (const y of years) {
-      if (state.abort) throw Object.assign(new Error('中止しました'), { code: 'aborted' });
-      const res = await fetch(`https://public.bitbank.cc/xrp_jpy/candlestick/1day/${y}`);
-      const j = await res.json();
-      if (!j.success) throw new Error('bitbank');
-      for (const c of j.data.candlestick[0].ohlcv) candles.push({ t: Number(c[5]), close: Number(c[3]) });
+// ---- XRP/円の日足 ----
+// 取得元を順に試す：bitbank → CoinGecko（直近365日のみ）→ Binance XRP/USDT × Frankfurter 米ドル/円
+// ※CryptoCompare は2026年5月に無料APIが終了したため使わない
+async function getJSON(url, ms = 20000) {
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), ms);
+  let res;
+  try { res = await fetch(url, { signal: ac.signal }); }
+  catch (e) {
+    throw new Error(e.name === 'AbortError' ? '応答がありません（タイムアウト）' : '通信がブロックされました（広告ブロッカー・ブラウザの追跡防止・ネットワーク制限などの可能性）');
+  } finally { clearTimeout(t); }
+  if (!res.ok) throw new Error(`HTTP ${res.status}` + (res.status === 429 ? '（アクセス集中による制限）' : res.status === 403 || res.status === 451 ? '（地域・ネットワークによる制限の可能性）' : ''));
+  try { return await res.json(); } catch (e) { throw new Error('応答の形式が不正です'); }
+}
+const jstDay = ms => new Date(ms + 9 * 3600e3).toISOString().slice(0, 10);
+const utcDay = ms => new Date(ms).toISOString().slice(0, 10);
+const checkAbort = () => { if (state.abort) throw Object.assign(new Error('中止しました'), { code: 'aborted' }); };
+
+const FX_SOURCES = [
+  { name: 'bitbank', note: 'bitbank XRP/JPY 日足終値', async load(tMin, tMax) {
+    const out = [];
+    const y0 = new Date(tMin + 9 * 3600e3).getUTCFullYear(), y1 = new Date(tMax + 9 * 3600e3).getUTCFullYear();
+    for (let y = y0; y <= y1; y++) {
+      checkAbort();
+      const j = await getJSON(`https://public.bitbank.cc/xrp_jpy/candlestick/1day/${y}`);
+      if (!j.success) throw new Error('エラー応答（コード ' + (j.data && j.data.code) + '）');
+      for (const c of j.data.candlestick[0].ohlcv) out.push({ t: Number(c[5]), close: Number(c[3]) });
     }
-  } catch (e) {
-    if (e.code === 'aborted') throw e;
-    candles.length = 0; src = 'CryptoCompare';
-    let to = Math.ceil(Math.max(...times) / 1000) + 86400;
-    const from = Math.floor(Math.min(...times) / 1000) - 86400 * 3;
-    while (to > from) {
-      const res = await fetch(`https://min-api.cryptocompare.com/data/v2/histoday?fsym=XRP&tsym=JPY&limit=2000&toTs=${to}`);
-      const j = await res.json();
-      const d = (j.Data && j.Data.Data) || [];
-      if (!d.length) throw new Error('XRP/円の価格データを取得できませんでした');
-      for (const c of d) if (c.close > 0) candles.push({ t: c.time * 1000, close: c.close });
-      to = d[0].time - 1;
+    return out;
+  } },
+  { name: 'CoinGecko', note: 'CoinGecko XRP/JPY 日次', async load(tMin, tMax) {
+    if (Date.now() - tMin > 360 * 86400e3) throw new Error('無料版は直近365日分のみのため対象外');
+    const j = await getJSON(`https://api.coingecko.com/api/v3/coins/ripple/market_chart/range?vs_currency=jpy&from=${Math.floor(tMin / 1000) - 3 * 86400}&to=${Math.ceil(tMax / 1000) + 86400}`);
+    if (!j.prices || !j.prices.length) throw new Error('データがありません');
+    return j.prices.map(([t, p]) => ({ t: Number(t), close: Number(p) }));
+  } },
+  { name: 'Binance×Frankfurter', note: 'Binance XRP/USDT 日足終値×Frankfurter 米ドル/円', async load(tMin, tMax) {
+    const usd = [];
+    for (let st = tMin - 3 * 86400e3; st <= tMax + 86400e3;) {
+      checkAbort();
+      const k = await getJSON(`https://data-api.binance.vision/api/v3/klines?symbol=XRPUSDT&interval=1d&startTime=${Math.floor(st)}&endTime=${Math.ceil(tMax + 86400e3)}&limit=1000`);
+      if (!Array.isArray(k) || !k.length) break;
+      for (const c of k) usd.push({ t: Number(c[0]), close: Number(c[4]) });
+      st = Number(k[k.length - 1][0]) + 86400e3;
+      if (k.length < 1000) break;
+    }
+    if (!usd.length) throw new Error('XRP/USDTのデータがありません（2018年5月より前は非対応）');
+    checkAbort();
+    const fx = await getJSON(`https://api.frankfurter.dev/v1/${utcDay(tMin - 10 * 86400e3)}..${utcDay(tMax + 86400e3)}?base=USD&symbols=JPY`);
+    const days = Object.keys(fx.rates || {}).sort();
+    if (!days.length) throw new Error('米ドル/円のデータがありません');
+    // 為替は平日のみ → その日以前で一番近い日のレートを使う
+    let i = 0, last = null;
+    return usd.map(c => {
+      const d = utcDay(c.t);
+      while (i < days.length && days[i] <= d) last = fx.rates[days[i++]].JPY;
+      return last ? { t: c.t, close: c.close * last } : null;
+    }).filter(Boolean);
+  } },
+];
+
+async function loadXrpJpy(times, onStep) {
+  const tMin = Math.min(...times), tMax = Math.max(...times);
+  const fails = [], used = [];
+  const atOf = candles => ms => { // その時刻を含む日足の終値
+    let lo = 0, hi = candles.length - 1, k = -1;
+    while (lo <= hi) { const m = (lo + hi) >> 1; if (candles[m].t <= ms) { k = m; lo = m + 1; } else hi = m - 1; }
+    if (k < 0 || ms - candles[k].t > 3 * 86400e3) return null;
+    return candles[k].close;
+  };
+  // 先に試した取得元を優先。足りない日だけ次の取得元で補う
+  const at = ms => { for (const u of used) { const v = u.at(ms); if (v != null) return { v, src: u }; } return null; };
+  for (const src of FX_SOURCES) {
+    if (used.length && times.every(t => at(t))) break;
+    checkAbort();
+    onStep && onStep(src.name);
+    try {
+      const candles = (await src.load(tMin, tMax)).filter(c => c.close > 0).sort((a, b) => a.t - b.t);
+      if (!candles.length) throw new Error('データがありません');
+      used.push({ name: src.name, note: src.note, at: atOf(candles) });
+    } catch (e) {
+      if (e.code === 'aborted') throw e;
+      fails.push(`${src.name}：${e.message}`);
     }
   }
-  candles.sort((a, b) => a.t - b.t);
-  if (!candles.length) throw new Error('XRP/円の価格データを取得できませんでした');
-  return {
-    src,
-    at(ms) { // その時刻を含む日足の終値
-      let lo = 0, hi = candles.length - 1, k = -1;
-      while (lo <= hi) { const m = (lo + hi) >> 1; if (candles[m].t <= ms) { k = m; lo = m + 1; } else hi = m - 1; }
-      if (k < 0 || ms - candles[k].t > 3 * 86400e3) return null;
-      return candles[k].close;
-    }
-  };
+  if (!used.length || !times.some(t => at(t))) {
+    const err = new Error('XRP/円の価格をどこからも取得できませんでした。\n' + fails.join('\n'));
+    err.code = 'nofx';
+    throw err;
+  }
+  return { at, fails, names: used.map(u => u.name) };
 }
 
 // その時点のトークンのXRP建て価格
+const NOT_FOUND = ['actNotFound', 'objectNotFound', 'entryNotFound', 'ammNotFound'];
 async function tokenXrpPrice(client, asset, ledger, time) {
   const tok = { currency: asset.currency, issuer: asset.issuer };
+  let nodeErr = null;
+  const note = e => { if (e.code === 'aborted') throw e; if (!NOT_FOUND.includes(e.code)) nodeErr = e.code || e.message; };
   if (ledger) {
     try {
       const r = await client.request({ command: 'amm_info', asset: { currency: 'XRP' }, asset2: tok, ledger_index: ledger });
       const x = Number(r.amm.amount) / 1e6, t = Number(r.amm.amount2.value);
       if (x > 0 && t > 0) return { p: x / t, src: 'AMM' };
-    } catch (e) { if (e.code === 'aborted') throw e; }
+    } catch (e) { note(e); }
     try {
       const px = o => { const g = o.TakerGets, pays = o.TakerPays; return typeof g === 'string' ? (Number(g) / 1e6) / Number(pays.value) : (Number(pays) / 1e6) / Number(g.value); };
       const [bid, ask] = await Promise.all([
@@ -1024,7 +1080,7 @@ async function tokenXrpPrice(client, asset, ledger, time) {
       const a = ask.offers && ask.offers[0] ? px(ask.offers[0]) : null;
       if (b && a && a / b < 3) return { p: (a + b) / 2, src: '板の仲値' };
       if (b && a) return { p: Math.sqrt(a * b), src: '板（価格差大・要確認）' };
-    } catch (e) { if (e.code === 'aborted') throw e; }
+    } catch (e) { note(e); }
   }
   // 自分のXRP建て取引のうち、30日以内で一番近いもの
   let best = null;
@@ -1034,7 +1090,7 @@ async function tokenXrpPrice(client, asset, ledger, time) {
     if (dt <= 30 * 86400e3 && (!best || dt < best.dt)) best = { dt, p: Number(r.price) };
   }
   if (best) return { p: best.p, src: `自分の取引（${Math.round(best.dt / 86400e3)}日差）` };
-  return null;
+  return { none: true, nodeErr };
 }
 
 async function estimatePrices() {
@@ -1052,18 +1108,20 @@ async function estimatePrices() {
   state.busy = true; state.abort = false;
   $('estBtn').textContent = '中止'; $('fetchBtn').disabled = true;
   const client = new XRPLClient(state.server || $('server').value);
-  let ok = 0, ng = 0;
+  let ok = 0;
+  const miss = { fx: 0, market: 0, node: 0 }; let nodeErrCode = '';
   try {
-    setE('XRP/円の価格データを取得中…');
-    const fx = await loadXrpJpy([...groups.values()].map(g => g[0].time));
-    setE('接続中…');
-    await client.connect();
+    const fx = await loadXrpJpy([...groups.values()].map(g => g[0].time), name => setE(`XRP/円の価格データを取得中…（${name}）`));
+    setE('XRPLノードに接続中…');
+    try { await client.connect(); }
+    catch (e) { throw new Error('XRPLノードに接続できませんでした（' + client.url + '）。接続先ノードを変えて「取得」からやり直してください。'); }
     const cache = new Map();
     const list = [...groups.values()];
     let done = 0;
     const work = async g => {
-      const jpy = fx.at(g[0].time);
-      let est = null;
+      const fxHit = fx.at(g[0].time);
+      const jpy = fxHit && fxHit.v;
+      let est = null, why = jpy ? 'market' : 'fx';
       if (jpy) {
         // ペアのうち、相場が取れるトークン側の円換算額を基準にする
         for (const r of g) {
@@ -1071,7 +1129,8 @@ async function estimatePrices() {
           const k = r.asset.key + '@' + (r.ledger || r.time);
           if (!cache.has(k)) cache.set(k, tokenXrpPrice(client, r.asset, r.ledger, r.time));
           const q = await cache.get(k);
-          if (q) { est = { base: r, q, total: q.p * Number(fmt(r.volume)) * jpy }; break; }
+          if (q && !q.none) { est = { base: r, q, total: q.p * Number(fmt(r.volume)) * jpy }; break; }
+          if (q && q.nodeErr) { why = 'node'; nodeErrCode = q.nodeErr; }
         }
       }
       if (est) {
@@ -1080,12 +1139,12 @@ async function estimatePrices() {
           if (!vol) continue;
           const p = r === est.base ? est.q.p * jpy : est.total / vol;
           const note = r === est.base
-            ? `1${r.base}=${shortNum(est.q.p)}XRP(${est.q.src})×XRP ${shortNum(jpy)}円`
+            ? `1${r.base}=${shortNum(est.q.p)}XRP(${est.q.src})×XRP ${shortNum(jpy)}円(${fxHit.src.name})`
             : `${est.base.base}の円換算額から按分`;
           state.est.set(r.id, { price: numStr(p), note });
         }
         ok++;
-      } else { g.forEach(r => state.est.delete(r.id)); ng++; }
+      } else { miss[why]++; } // 失敗しても前回の推定値は消さない
       done++;
       if (done % 5 === 0 || done === list.length) setE(`推定中… ${done}/${list.length}　※「中止」で止められます`);
     };
@@ -1094,9 +1153,16 @@ async function estimatePrices() {
     await Promise.all(Array.from({ length: 4 }, async () => {
       while (idx < list.length) { if (state.abort) throw Object.assign(new Error('中止しました'), { code: 'aborted' }); await work(list[idx++]); }
     }));
-    setE(`推定しました：${ok}件` + (ng ? `／推定できなかった：${ng}件（相場が見つからない・XRP/円が無い日。手入力してください）` : '') + `。XRP/円は${fx.src}の日足終値です。`, ng > 0);
+    const ng = miss.fx + miss.market + miss.node;
+    const lines = [`推定しました：${ok}件` + (ng ? `／推定できなかった：${ng}件（前回の推定値がある行はそのまま、無い行は空欄です。手入力してください）` : '')];
+    if (miss.market) lines.push(`・相場が見つからないトークン：${miss.market}件（AMM・板・30日以内の自分の取引のいずれもなし）`);
+    if (miss.node) lines.push(`・ノードから過去の相場を取得できなかった：${miss.node}件（${nodeErrCode}）→ 接続先を「xrplcluster.com」「s2.ripple.com」など全履歴ノードにして取得し直すと改善する場合があります`);
+    if (miss.fx) lines.push(`・その日のXRP/円が無い：${miss.fx}件`);
+    lines.push(`XRP/円の取得元：${fx.names.join('、')}` + (fx.fails.length ? `（取得できなかった取得元 → ${fx.fails.join(' ／ ')}）` : ''));
+    setE(lines.join('\n'), ng > 0);
   } catch (e) {
-    setE(e.code === 'aborted' ? `推定を中止しました（${ok}件は反映済み）` : 'エラー：' + e.message, e.code !== 'aborted');
+    setE(e.code === 'aborted' ? `推定を中止しました（${ok}件は反映済み）`
+      : 'エラー：' + e.message + (e.code === 'nofx' ? '\n→ 広告ブロッカーやブラウザの追跡防止機能をこのページだけ無効にするか、別のブラウザ・回線でお試しください。' : ''), e.code !== 'aborted');
   } finally {
     client.close();
     state.busy = false; state.abort = false;
@@ -1108,7 +1174,7 @@ async function estimatePrices() {
 }
 
 // ---------- 免責事項への同意 ----------
-const AGREE_KEY = 'xrpl-tax-agree-v1'; // 免責事項の内容を変えたら版を上げて再同意を求める
+const AGREE_KEY = 'xrpl-tax-agree-v2'; // 免責事項の内容を変えたら版を上げて再同意を求める
 function agreed() { return $('agree').checked; }
 function applyAgree() {
   if (state.busy) return;
