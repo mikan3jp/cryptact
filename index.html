@@ -58,6 +58,10 @@ details summary{cursor:pointer;font-weight:600}
 .note li{margin-bottom:4px}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .filters select{width:auto}
+.tip{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.tip .qr{width:148px;height:148px;border-radius:8px;flex:none;border:1px solid var(--line)}
+.tip-body{flex:1 1 260px;min-width:0}
+.addr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0}
 .disc{border-color:var(--warn)}
 .disc h2{color:var(--warn)}
 .disc-body{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--bg);font-size:13px}
@@ -86,6 +90,7 @@ button:disabled{cursor:not-allowed}
         <li><b>入力内容の保存について。</b>アドレス・設定・手入力した価格・推定値等は、利用中のブラウザ内（localStorage）にのみ保存され、外部には送信されません。ただし、ブラウザの設定やデータ削除により消失する場合や、共用端末では他の利用者に閲覧される場合があります。</li>
         <li><b>損害について一切の責任を負いません。</b>本ツールの利用または利用できなかったことにより生じたいかなる損害（申告誤り、修正申告・更正、過少申告加算税・無申告加算税・重加算税・延滞税等の負担、税理士等への費用、逸失利益、データの消失を含みますが、これらに限りません）についても、作成者は一切の責任を負いません。</li>
         <li><b>予告なく変更・停止することがあります。</b>本ツールの内容・機能・変換ルールは予告なく変更、または提供を停止することがあります。</li>
+        <li><b>応援の送金について。</b>ページ下部の応援（XRPの送金）は完全に任意です。送金の有無により機能・利用条件は変わらず、送金によってサポート・保証・継続提供その他の義務が生じるものではありません。送金の取消・返金には応じられません。送金先アドレスの確認および送金にかかる手数料・税務上の取扱いは送金者ご自身の責任となります。</li>
         <li>本ツールを利用した時点で、本免責事項のすべてに同意したものとみなします。</li>
       </ol>
     </div>
@@ -170,6 +175,7 @@ button:disabled{cursor:not-allowed}
       <button class="sec" id="estBtn" title="価格が未入力の行を、XRPL上の相場とXRP/円の日足から推定して埋めます">円単価を自動推定</button>
       <button id="dlBtn">CSVをダウンロード</button>
     </div>
+    <p id="dlDone" class="status hidden" style="margin:-4px 0 10px;color:var(--ok)">CSVをダウンロードしました。お役に立てたら、<a href="#tipCard">ページ下部から応援</a>していただけるとうれしいです（任意）。</p>
     <div id="estStatus" class="status" style="margin:-4px 0 10px;white-space:pre-line"></div>
     <p class="muted" style="margin:-4px 0 10px">※「推定」の印が付いた円単価は近似値です。実際の時価と異なる場合があります（<a href="#disclaimer">免責事項</a>）。出力内容はアップロード前に必ずご自身で確認してください。</p>
     <p class="muted" style="margin:-4px 0 10px">※クリプタクトは二重計上防止のため、カスタムファイルを追加でアップすると<b>すでに取り込まれた最新の日時より後の取引しか取り込みません</b>。古い期間から順にアップしてください。修正したCSVをアップし直すときは、先にクリプタクト上で前回アップ分を削除してください。</p>
@@ -184,6 +190,19 @@ button:disabled{cursor:not-allowed}
       <textarea id="coinList" readonly style="min-height:90px"></textarea>
       <button class="sec" id="copyCoins" style="margin-top:6px">コピー</button>
     </details>
+  </section>
+
+  <section class="card" id="tipCard">
+    <h2>応援（任意）</h2>
+    <div class="tip">
+      <svg class="qr" viewBox="-4 -4 37 37" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="送金先アドレスのQRコード" shape-rendering="crispEdges"><rect x="-4" y="-4" width="37" height="37" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM8 0h3v1h-3zM13 0h3v1h-3zM17 0h1v1h-1zM20 0h1v1h-1zM22 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM15 1h1v1h-1zM17 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h2v1h-2zM17 2h2v1h-2zM20 2h1v1h-1zM22 2h1v1h-1zM24 2h3v1h-3zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM15 3h1v1h-1zM18 3h2v1h-2zM22 3h1v1h-1zM24 3h3v1h-3zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM10 4h1v1h-1zM15 4h2v1h-2zM18 4h1v1h-1zM22 4h1v1h-1zM24 4h3v1h-3zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h5v1h-5zM17 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h7v1h-7zM9 7h1v1h-1zM13 7h1v1h-1zM18 7h2v1h-2zM0 8h1v1h-1zM2 8h1v1h-1zM6 8h2v1h-2zM9 8h1v1h-1zM13 8h1v1h-1zM15 8h2v1h-2zM20 8h1v1h-1zM23 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM1 9h3v1h-3zM5 9h1v1h-1zM18 9h3v1h-3zM23 9h1v1h-1zM26 9h2v1h-2zM1 10h3v1h-3zM6 10h3v1h-3zM10 10h2v1h-2zM13 10h3v1h-3zM17 10h4v1h-4zM22 10h4v1h-4zM28 10h1v1h-1zM2 11h4v1h-4zM7 11h1v1h-1zM10 11h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM16 11h1v1h-1zM18 11h2v1h-2zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM3 12h1v1h-1zM5 12h3v1h-3zM12 12h3v1h-3zM16 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM28 12h1v1h-1zM0 13h1v1h-1zM3 13h2v1h-2zM9 13h2v1h-2zM12 13h5v1h-5zM18 13h5v1h-5zM25 13h1v1h-1zM28 13h1v1h-1zM4 14h4v1h-4zM12 14h1v1h-1zM15 14h2v1h-2zM18 14h2v1h-2zM22 14h4v1h-4zM28 14h1v1h-1zM3 15h1v1h-1zM7 15h2v1h-2zM11 15h3v1h-3zM15 15h2v1h-2zM19 15h5v1h-5zM25 15h1v1h-1zM28 15h1v1h-1zM0 16h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h5v1h-5zM13 16h1v1h-1zM15 16h2v1h-2zM18 16h2v1h-2zM22 16h1v1h-1zM24 16h2v1h-2zM4 17h2v1h-2zM7 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM16 17h1v1h-1zM18 17h2v1h-2zM23 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM0 18h2v1h-2zM3 18h2v1h-2zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h6v1h-6zM17 18h1v1h-1zM19 18h1v1h-1zM23 18h2v1h-2zM28 18h1v1h-1zM4 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM14 19h3v1h-3zM19 19h2v1h-2zM22 19h2v1h-2zM25 19h1v1h-1zM28 19h1v1h-1zM0 20h4v1h-4zM6 20h3v1h-3zM10 20h2v1h-2zM13 20h3v1h-3zM19 20h10v1h-10zM8 21h2v1h-2zM11 21h1v1h-1zM13 21h5v1h-5zM19 21h2v1h-2zM24 21h1v1h-1zM27 21h2v1h-2zM0 22h7v1h-7zM8 22h1v1h-1zM15 22h1v1h-1zM18 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM28 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM10 23h4v1h-4zM15 23h1v1h-1zM19 23h2v1h-2zM24 23h2v1h-2zM28 23h1v1h-1zM0 24h1v1h-1zM2 24h3v1h-3zM6 24h1v1h-1zM12 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM19 24h10v1h-10zM0 25h1v1h-1zM2 25h3v1h-3zM6 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM18 25h2v1h-2zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h3v1h-3zM6 26h1v1h-1zM8 26h2v1h-2zM11 26h5v1h-5zM18 26h1v1h-1zM20 26h3v1h-3zM24 26h1v1h-1zM27 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h3v1h-3zM14 27h1v1h-1zM18 27h1v1h-1zM20 27h2v1h-2zM24 27h2v1h-2zM0 28h7v1h-7zM8 28h3v1h-3zM13 28h2v1h-2zM16 28h1v1h-1zM20 28h3v1h-3zM25 28h1v1h-1zM28 28h1v1h-1z"/></svg>
+      <div class="tip-body">
+        <p style="margin:0">このツールは無料です。役に立ったと感じていただけたら、お気持ちでXRPを送っていただけると開発・維持の励みになります。</p>
+        <div class="addr" id="tipAddr">rndZvkCCntT4EwNDew7zkj2Kq24jSi3wFm</div>
+        <button class="sec" id="copyTip">アドレスをコピー</button>
+        <p class="muted" style="margin:8px 0 0">送金は任意で、送らなくても機能や利用条件は変わりません。宛先タグは不要です。送金前にアドレスの先頭と末尾が一致しているかご確認ください。送金の取消・返金はできません。</p>
+      </div>
+    </div>
   </section>
 
   <section class="card">
@@ -953,6 +972,7 @@ function download() {
   a.href = URL.createObjectURL(blob);
   a.download = `xrpl_cryptact_${state.me.slice(0, 8)}_${periodLabel()}.csv`;
   document.body.appendChild(a); a.click(); a.remove();
+  $('dlDone').classList.remove('hidden');
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
@@ -1174,7 +1194,7 @@ async function estimatePrices() {
 }
 
 // ---------- 免責事項への同意 ----------
-const AGREE_KEY = 'xrpl-tax-agree-v2'; // 免責事項の内容を変えたら版を上げて再同意を求める
+const AGREE_KEY = 'xrpl-tax-agree-v3'; // 免責事項の内容を変えたら版を上げて再同意を求める
 function agreed() { return $('agree').checked; }
 function applyAgree() {
   if (state.busy) return;
@@ -1297,6 +1317,13 @@ $('rows').addEventListener('keydown', e => {
   e.target.dispatchEvent(new Event('change', { bubbles: true }));
   const next = $('rows').querySelectorAll('input.price')[i + 1]; // 描き直された場合に備えて取り直す
   if (next) { next.focus(); next.select(); }
+});
+$('copyTip').addEventListener('click', async () => {
+  const v = $('tipAddr').textContent.trim();
+  try { await navigator.clipboard.writeText(v); }
+  catch (e) { const r = document.createRange(); r.selectNodeContents($('tipAddr')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); }
+  $('copyTip').textContent = 'コピーしました';
+  setTimeout(() => { $('copyTip').textContent = 'アドレスをコピー'; }, 1500);
 });
 $('copyCoins').addEventListener('click', async () => {
   const ta = $('coinList');
