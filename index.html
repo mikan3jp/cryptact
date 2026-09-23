@@ -58,12 +58,39 @@ details summary{cursor:pointer;font-weight:600}
 .note li{margin-bottom:4px}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .filters select{width:auto}
+.disc{border-color:var(--warn)}
+.disc h2{color:var(--warn)}
+.disc-body{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--bg);font-size:13px}
+.disc-body ol{margin:0;padding-left:1.3em}
+.disc-body li{margin-bottom:6px}
+.agree{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:14px;color:var(--text);cursor:pointer}
+.agree input{width:auto;margin-top:4px}
+button:disabled{cursor:not-allowed}
 </style>
 </head>
 <body>
 <main>
   <h1>XRPL Tax Export</h1>
   <p class="sub">XRP Ledgerの取引履歴をクリプタクトのカスタムファイル（CSV）に変換します。処理はすべてブラウザ内で完結し、秘密鍵は不要です。</p>
+
+  <section class="card disc" id="disclaimer">
+    <h2>免責事項（ご利用前に必ずお読みください）</h2>
+    <div class="disc-body">
+      <ol>
+        <li><b>非公式ツールです。</b>本ツールは個人が作成した非公式のツールであり、Ripple社、XRP Ledger Foundation、クリプタクト（株式会社pafin）、bitbank、CryptoCompare、その他いかなる事業者とも関係がなく、これらの承認・保証を受けたものではありません。</li>
+        <li><b>税務・会計・法律の助言ではありません。</b>本ツールおよび出力内容は情報提供を目的とするものであり、税務相談・税務代理・税務書類の作成その他の専門的助言を行うものではありません。暗号資産・NFT・DeFi（DEX、AMM、流動性提供等）の税務上の取扱いには明確な指針がない部分があり、本ツールの分類方法（交換、流動性提供の差損益、NFTのミント、送受金の除外・BONUS扱い等）は作成者の解釈に基づく一例にすぎません。申告内容の最終判断は、必ずご自身の責任で、税理士または所轄の税務署にご確認ください。</li>
+        <li><b>円単価の自動推定はあくまで推定値です。</b>「円単価を自動推定」で入力される価格は、取引時点のAMMプール比率・DEXの板の仲値・利用者自身の近い日付の取引、および外部サービスのXRP/円の日足終値を組み合わせて算出した近似値です。実際の取引価格、税務上の時価、クリプタクトが参照する時価とは異なる場合があり、流動性の低い相場、価格差の大きい板、意図的に操作された相場、日中の価格変動等により大きく乖離することがあります。推定値を利用するかどうか、どの価格を時価とするかは利用者ご自身の判断と責任で決定してください。</li>
+        <li><b>出力内容の正確性・完全性を保証しません。</b>取引の取得漏れ・重複、分類の誤り、数量・価格の計算誤差や端数処理、想定していない取引形態（トークン発行者のアドレス、エスクロー、ペイメントチャネル、クローバック、複合的な取引等）による誤った出力が含まれる可能性があります。出力されたCSVは、アップロード前に必ずご自身で全件確認・修正してください。</li>
+        <li><b>外部データに依存します。</b>取引履歴はXRPLの公開ノード、XRP/円の価格はbitbankまたはCryptoCompareの公開データから取得しています。これらのデータの誤り・欠落・遅延、サービスの停止・仕様変更・利用制限、ノードが保持する履歴の範囲により、結果が不正確または不完全になることがあります。</li>
+        <li><b>クリプタクトでの取込み・計算結果を保証しません。</b>クリプタクトの仕様（カスタムファイルの形式、取引種類、カスタムコイン、価格参照、計算方法等）は変更されることがあり、本ツールの出力がアップロードできない、または意図と異なる計算結果になる場合があります。</li>
+        <li><b>入力内容の保存について。</b>アドレス・設定・手入力した価格・推定値等は、利用中のブラウザ内（localStorage）にのみ保存され、外部には送信されません。ただし、ブラウザの設定やデータ削除により消失する場合や、共用端末では他の利用者に閲覧される場合があります。</li>
+        <li><b>損害について一切の責任を負いません。</b>本ツールの利用または利用できなかったことにより生じたいかなる損害（申告誤り、修正申告・更正、過少申告加算税・無申告加算税・重加算税・延滞税等の負担、税理士等への費用、逸失利益、データの消失を含みますが、これらに限りません）についても、作成者は一切の責任を負いません。</li>
+        <li><b>予告なく変更・停止することがあります。</b>本ツールの内容・機能・変換ルールは予告なく変更、または提供を停止することがあります。</li>
+        <li>本ツールを利用した時点で、本免責事項のすべてに同意したものとみなします。</li>
+      </ol>
+    </div>
+    <label class="agree"><input type="checkbox" id="agree"> <span>上記の免責事項をすべて読み、内容に同意したうえで、自己の責任において利用します。</span></label>
+  </section>
 
   <section class="card">
     <div class="row">
@@ -144,6 +171,7 @@ details summary{cursor:pointer;font-weight:600}
       <button id="dlBtn">CSVをダウンロード</button>
     </div>
     <div id="estStatus" class="status" style="margin:-4px 0 10px"></div>
+    <p class="muted" style="margin:-4px 0 10px">※「推定」の印が付いた円単価は近似値です。実際の時価と異なる場合があります（<a href="#disclaimer">免責事項</a>）。出力内容はアップロード前に必ずご自身で確認してください。</p>
     <div class="tbl"><table>
       <thead><tr><th>日時</th><th>種類</th><th>主軸通貨</th><th>取引量</th><th>価格</th><th>決済通貨</th><th>内容</th></tr></thead>
       <tbody id="rows"></tbody>
@@ -170,7 +198,7 @@ details summary{cursor:pointer;font-weight:600}
         <li>「円単価を自動推定」：価格が未入力の行を「その時点のトークンのXRP建て価格 × その日のXRP/円終値」で埋めます。XRP建て価格は、取引時点のレジャーのAMMプール比率 → 板の仲値 → 30日以内の自分のXRP建て取引の順に探します。XRP/円はbitbank（取れない場合はCryptoCompare）の日足終値です。推定の根拠はCSVのコメント欄に残ります。あくまで推定値なので、大きな金額の行は確認してください。</li>
         <li>カスタムコインのBONUS・SELL等は時価がクリプタクトに無いため、価格欄にJPY建ての1枚あたり価格を入力してください（空欄だと「価格データ欠落」になります）。</li>
         <li>自分がトークン発行者のアドレスや、エスクロー・ペイメントチャネルの細かな扱いは想定外の出力になる場合があります。</li>
-        <li>税務上の取扱いの最終判断は税理士・税務署にご確認ください。出力内容は必ずご自身で確認のうえご利用ください（自己責任）。</li>
+        <li>税務上の取扱いの最終判断は税理士・税務署にご確認ください。出力内容は必ずご自身で確認のうえご利用ください（詳しくはページ上部の<a href="#disclaimer">免責事項</a>）。</li>
       </ul>
     </details>
   </section>
@@ -653,6 +681,7 @@ async function withRetry(fn, tries = 4) {
 
 async function run() {
   if (state.busy) { state.abort = true; setStatus('中止しています…'); return; }
+  if (!requireAgree()) return;
   const me = $('addr').value.trim();
   if (!isAddress(me)) { setStatus('XRPLアドレス（rで始まる）を正しく入力してください', true); return; }
   let meHex;
@@ -748,6 +777,7 @@ async function run() {
     state.busy = false; state.abort = false;
     $('fetchBtn').textContent = '取得';
     $('estBtn').disabled = false;
+    applyAgree();
   }
 }
 
@@ -906,6 +936,7 @@ function renderStats() {
 function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
 function download() {
+  if (!requireAgree()) return;
   const rows = visibleRows();
   const exp = rows.filter(isExport);
   if (!exp.length) { alert('出力する行がありません。'); return; }
@@ -1006,6 +1037,7 @@ async function tokenXrpPrice(client, asset, ledger, time) {
 
 async function estimatePrices() {
   if (state.busy) { state.abort = true; return; }
+  if (!requireAgree()) return;
   const setE = (m, err) => { $('estStatus').textContent = m; $('estStatus').className = 'status' + (err ? ' err' : ''); };
   // 対象：期間内で価格が未入力（または前回推定）のJPY建て行。ペア（トークン同士の交換など）は相手の行も含める
   const vis = visibleRows().filter(r => isExport(r) && r.counter === 'JPY' && r.priceEditable && (r.needsPrice || r.priceEst));
@@ -1067,10 +1099,36 @@ async function estimatePrices() {
     client.close();
     state.busy = false; state.abort = false;
     $('estBtn').textContent = '円単価を自動推定'; $('fetchBtn').disabled = false;
+    applyAgree();
     saveUserData();
     recompute();
   }
 }
+
+// ---------- 免責事項への同意 ----------
+const AGREE_KEY = 'xrpl-tax-agree-v1'; // 免責事項の内容を変えたら版を上げて再同意を求める
+function agreed() { return $('agree').checked; }
+function applyAgree() {
+  if (state.busy) return;
+  ['fetchBtn', 'estBtn', 'dlBtn'].forEach(id => {
+    const b = $(id);
+    if (b.dataset.title === undefined) b.dataset.title = b.title || '';
+    b.disabled = !agreed();
+    b.title = agreed() ? b.dataset.title : '免責事項に同意すると使えます';
+  });
+}
+function requireAgree() {
+  if (agreed()) return true;
+  $('disclaimer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  alert('ご利用前に、免責事項を読んで「同意」にチェックしてください。');
+  return false;
+}
+try { $('agree').checked = localStorage.getItem(AGREE_KEY) === '1'; } catch (e) {}
+$('agree').addEventListener('change', () => {
+  try { if (agreed()) localStorage.setItem(AGREE_KEY, '1'); else localStorage.removeItem(AGREE_KEY); } catch (e) {}
+  applyAgree();
+});
+applyAgree();
 
 // ---------- イベント ----------
 $('estBtn').addEventListener('click', estimatePrices);
