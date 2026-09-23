@@ -140,8 +140,10 @@ details summary{cursor:pointer;font-weight:600}
       </select>
       <span class="muted" id="shownCount"></span>
       <span style="flex:1"></span>
+      <button class="sec" id="estBtn" title="価格が未入力の行を、XRPL上の相場とXRP/円の日足から推定して埋めます">円単価を自動推定</button>
       <button id="dlBtn">CSVをダウンロード</button>
     </div>
+    <div id="estStatus" class="status" style="margin:-4px 0 10px"></div>
     <div class="tbl"><table>
       <thead><tr><th>日時</th><th>種類</th><th>主軸通貨</th><th>取引量</th><th>価格</th><th>決済通貨</th><th>内容</th></tr></thead>
       <tbody id="rows"></tbody>
@@ -165,6 +167,7 @@ details summary{cursor:pointer;font-weight:600}
         <li>表で入力した価格・種類、トークン名、既定の単価は、このブラウザにアドレスごとに保存され、次回取得時に自動で復元されます（外部には送信しません）。</li>
         <li>NFT: 購入=BUY、売却=SELL、ミント=手数料を取得価額としたBUY。名称は USER-NFT-発行者-連番 です。</li>
         <li>単純な送受金は既定で除外（自己送金とみなす）。トークン・NFTの受取は既定でBONUS。表の「種類」から1件ずつ変更できます。</li>
+        <li>「円単価を自動推定」：価格が未入力の行を「その時点のトークンのXRP建て価格 × その日のXRP/円終値」で埋めます。XRP建て価格は、取引時点のレジャーのAMMプール比率 → 板の仲値 → 30日以内の自分のXRP建て取引の順に探します。XRP/円はbitbank（取れない場合はCryptoCompare）の日足終値です。推定の根拠はCSVのコメント欄に残ります。あくまで推定値なので、大きな金額の行は確認してください。</li>
         <li>カスタムコインのBONUS・SELL等は時価がクリプタクトに無いため、価格欄にJPY建ての1枚あたり価格を入力してください（空欄だと「価格データ欠落」になります）。</li>
         <li>自分がトークン発行者のアドレスや、エスクロー・ペイメントチャネルの細かな扱いは想定外の出力になる場合があります。</li>
         <li>税務上の取扱いの最終判断は税理士・税務署にご確認ください。出力内容は必ずご自身で確認のうえご利用ください（自己責任）。</li>
@@ -326,6 +329,7 @@ function analyzeTx(t, me, meHex, reg, pools) {
 
   return {
     hash, time, type: tx.TransactionType, result: meta.TransactionResult,
+    ledger: Number(tx.ledger_index ?? t.ledger_index ?? 0) || null,
     sender: tx.Account, dest: tx.Destination, owner: tx.Owner,
     fee, changes: [...changes.values()]
   };
@@ -383,7 +387,8 @@ function classifyAll(list, ctx) {
         id, time: a.time, hash: a.hash, txType: a.type,
         source: o.source || ctx.source, action: o.action, base: o.base || '', volume: o.vol ?? 0n,
         price: o.price ?? '', counter: o.counter || 'JPY', label: o.label || '', flag: o.flag || '',
-        choices: o.choices || null, priceEditable: false
+        choices: o.choices || null, priceEditable: false,
+        ledger: a.ledger, asset: o.asset || null, group: o.group || null
       };
       const e = ctx.edits.get(id);
       if (e) {
@@ -393,9 +398,11 @@ function classifyAll(list, ctx) {
       r.priceEditable = r.action !== 'INFO' && r.action !== 'EXCLUDE' && !NO_PRICE_ACTIONS.includes(r.action);
       if (!r.priceEditable && NO_PRICE_ACTIONS.includes(r.action)) r.price = '';
       // 未入力なら、トークンごとの既定単価（円）を使う
-      r.priceDefault = false;
-      if (r.priceEditable && r.price === '' && r.counter === 'JPY' && ctx.defPrice && ctx.defPrice.get(r.base)) {
-        r.price = ctx.defPrice.get(r.base); r.priceDefault = true;
+      // 優先順位：手入力 ＞ トークンの既定単価 ＞ 自動推定
+      r.priceDefault = false; r.priceEst = false; r.estNote = '';
+      if (r.priceEditable && r.price === '' && r.counter === 'JPY') {
+        if (ctx.defPrice && ctx.defPrice.get(r.base)) { r.price = ctx.defPrice.get(r.base); r.priceDefault = true; }
+        else if (ctx.est && ctx.est.get(id)) { const e = ctx.est.get(id); r.price = e.price; r.priceEst = true; r.estNote = e.note; }
       }
       updateNeedsPrice(r);
       if (r.priceEditable && (String(r.price).split('.')[1] || '').length > 15 && !r.flag)
@@ -414,14 +421,14 @@ function classifyAll(list, ctx) {
         if (own) { def = 'EXCLUDE'; label += '（自己アドレス）'; }
         if ((a.type === 'EscrowFinish' || a.type === 'EscrowCancel') && a.owner === ctx.me) { def = 'EXCLUDE'; label = `エスクロー戻り ${desc(c)}`; }
         if (a.type === 'PaymentChannelClaim' && a.sender === ctx.me && a.owner === undefined) { /* 自分のチャネル精算 */ }
-        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, choices: IN_CHOICES, flag, rk: 'io:' + c.asset.key });
+        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, choices: IN_CHOICES, flag, rk: 'io:' + c.asset.key, asset: c.asset });
       } else {
         let label = `送付 ${desc(c)}` + (cp && cp !== ctx.me ? ` → ${short(cp)}` : '');
         if (own) label += '（自己アドレス）';
         if (a.type === 'EscrowCreate') label = `エスクロー作成（自己資産のロック） ${desc(c)}`;
         let def = 'EXCLUDE';
         if (a.type === 'NFTokenBurn') { def = 'REDUCE'; label = `NFTバーン ${desc(c)}`; }
-        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, choices: OUT_CHOICES, flag, rk: 'io:' + c.asset.key });
+        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, choices: OUT_CHOICES, flag, rk: 'io:' + c.asset.key, asset: c.asset });
       }
     };
 
@@ -430,14 +437,14 @@ function classifyAll(list, ctx) {
       const gN = nameOf(give.asset), rN = nameOf(get.asset);
       const gv = abs(give.delta), rv = abs(get.delta);
       const label = `${what} ${fmt(gv)} ${gN} → ${fmt(rv)} ${rN}`;
-      if (get.asset.type === 'XRP') push({ action: 'SELL', base: gN, vol: gv, price: ratio(rv, gv), counter: 'XRP', label });
-      else if (give.asset.type === 'XRP') push({ action: 'BUY', base: rN, vol: rv, price: ratio(gv, rv), counter: 'XRP', label });
-      else if (!isCustom(rN) && get.asset.type !== 'NFT') push({ action: 'SELL', base: gN, vol: gv, price: ratio(rv, gv), counter: rN, label });
-      else if (!isCustom(gN) && give.asset.type !== 'NFT') push({ action: 'BUY', base: rN, vol: rv, price: ratio(gv, rv), counter: gN, label });
+      if (get.asset.type === 'XRP') push({ action: 'SELL', base: gN, vol: gv, price: ratio(rv, gv), counter: 'XRP', label, asset: give.asset });
+      else if (give.asset.type === 'XRP') push({ action: 'BUY', base: rN, vol: rv, price: ratio(gv, rv), counter: 'XRP', label, asset: get.asset });
+      else if (!isCustom(rN) && get.asset.type !== 'NFT') push({ action: 'SELL', base: gN, vol: gv, price: ratio(rv, gv), counter: rN, label, asset: give.asset });
+      else if (!isCustom(gN) && give.asset.type !== 'NFT') push({ action: 'BUY', base: rN, vol: rv, price: ratio(gv, rv), counter: gN, label, asset: get.asset });
       else {
         const f = 'トークン同士の交換：両行に同じ総額になるようJPY単価を入力';
-        push({ action: 'SELL', base: gN, vol: gv, counter: 'JPY', label, flag: f });
-        push({ action: 'BUY', base: rN, vol: rv, counter: 'JPY', label, flag: f });
+        push({ action: 'SELL', base: gN, vol: gv, counter: 'JPY', label, flag: f, asset: give.asset, group: a.hash + ':pair' });
+        push({ action: 'BUY', base: rN, vol: rv, counter: 'JPY', label, flag: f, asset: get.asset, group: a.hash + ':pair' });
       }
     };
 
@@ -493,8 +500,8 @@ function classifyAll(list, ctx) {
         for (const d of diffs) {
           if (d.diff === 0n) continue;
           const n = nameOf(d.asset);
-          if (d.diff > 0n) push({ action: noRecord ? 'EXCLUDE' : 'BONUS', base: n, vol: d.diff, counter: 'JPY', source: src, label: noRecord ? `AMM引出の受取 ${pName}` : `AMM引出の差益 ${pName}`, flag, choices: ['BONUS', 'EXCLUDE'], rk: 'amm:' + d.asset.key });
-          else push({ action: 'LOSS', base: n, vol: -d.diff, counter: 'JPY', source: src, label: `AMM引出の差損 ${pName}`, flag, choices: ['LOSS', 'REDUCE', 'EXCLUDE'], rk: 'amm:' + d.asset.key });
+          if (d.diff > 0n) push({ action: noRecord ? 'EXCLUDE' : 'BONUS', base: n, vol: d.diff, counter: 'JPY', source: src, label: noRecord ? `AMM引出の受取 ${pName}` : `AMM引出の差益 ${pName}`, flag, choices: ['BONUS', 'EXCLUDE'], rk: 'amm:' + d.asset.key, asset: d.asset });
+          else push({ action: 'LOSS', base: n, vol: -d.diff, counter: 'JPY', source: src, label: `AMM引出の差損 ${pName}`, flag, choices: ['LOSS', 'REDUCE', 'EXCLUDE'], rk: 'amm:' + d.asset.key, asset: d.asset });
         }
       } else {
         transfer(l, 'LPトークンの移動（要確認）');
@@ -511,8 +518,8 @@ function classifyAll(list, ctx) {
           if (pay.asset.type === 'XRP' || !isCustom(pN)) push({ action: 'BUY', base: nameOf(g.asset), vol: ONE, price: ratio(each, ONE), counter: pN, label });
           else {
             const f = 'トークンでのNFT購入：両行に同じ総額になるようJPY単価を入力';
-            push({ action: 'SELL', base: pN, vol: each, counter: 'JPY', label, flag: f });
-            push({ action: 'BUY', base: nameOf(g.asset), vol: ONE, counter: 'JPY', label, flag: f });
+            push({ action: 'SELL', base: pN, vol: each, counter: 'JPY', label, flag: f, asset: pay.asset, group: a.hash + ':' + g.asset.key });
+            push({ action: 'BUY', base: nameOf(g.asset), vol: ONE, counter: 'JPY', label, flag: f, asset: g.asset, group: a.hash + ':' + g.asset.key });
           }
         }
       } else if (gained.length && !lost.length && !other.length) {
@@ -528,8 +535,8 @@ function classifyAll(list, ctx) {
           if (rc.asset.type === 'XRP' || !isCustom(rN)) push({ action: 'SELL', base: nameOf(g.asset), vol: ONE, price: ratio(each, ONE), counter: rN, label });
           else {
             const f = 'トークンでのNFT売却：両行に同じ総額になるようJPY単価を入力';
-            push({ action: 'SELL', base: nameOf(g.asset), vol: ONE, counter: 'JPY', label, flag: f });
-            push({ action: 'BUY', base: rN, vol: each, counter: 'JPY', label, flag: f });
+            push({ action: 'SELL', base: nameOf(g.asset), vol: ONE, counter: 'JPY', label, flag: f, asset: g.asset, group: a.hash + ':' + g.asset.key });
+            push({ action: 'BUY', base: rN, vol: each, counter: 'JPY', label, flag: f, asset: rc.asset, group: a.hash + ':' + g.asset.key });
           }
         }
       } else if (lost.length && !gained.length && !other.length) {
@@ -569,7 +576,7 @@ function toCSV(rows, tz) {
   for (const r of rows) {
     if (!isExport(r)) continue;
     out.push([tsStr(r.time, tz), r.action, r.source, r.base, fmt(r.volume), r.price, r.counter, '0', 'JPY',
-      `${r.txType} ${r.label} ${r.hash}`].map(cell).join(','));
+      `${r.txType} ${r.label}${r.priceEst ? ' 推定単価 ' + r.estNote : ''} ${r.hash}`].map(cell).join(','));
   }
   return out.join('\r\n') + '\r\n';
 }
@@ -578,19 +585,19 @@ function toCSV(rows, tz) {
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const state = { me: null, analyzed: [], assets: new Map(), pools: new Map(), names: new Map(), edits: new Map(), defPrice: new Map(), rows: [], shown: 300, busy: false, abort: false };
+const state = { me: null, analyzed: [], assets: new Map(), pools: new Map(), names: new Map(), edits: new Map(), defPrice: new Map(), est: new Map(), rows: [], shown: 300, busy: false, abort: false };
 
 // ---------- 手入力（価格・種類・トークン名・既定単価）をアドレスごとに保存 ----------
 const DATA_KEY = addr => 'xrpl-tax-data:' + addr;
 function saveUserData() {
   if (!state.me) return;
-  const o = { edits: [...state.edits], names: [...state.names], defPrice: [...state.defPrice] };
+  const o = { edits: [...state.edits], names: [...state.names], defPrice: [...state.defPrice], est: [...state.est] };
   try { localStorage.setItem(DATA_KEY(state.me), JSON.stringify(o)); } catch (e) {}
 }
 function loadUserData(addr) {
   let o = null;
   try { o = JSON.parse(localStorage.getItem(DATA_KEY(addr)) || 'null'); } catch (e) {}
-  return o || { edits: [], names: [], defPrice: [] };
+  return Object.assign({ edits: [], names: [], defPrice: [], est: [] }, o || {});
 }
 // 全角数字などを半角に。数値として不正なら null
 function normNum(s) {
@@ -658,6 +665,7 @@ async function run() {
 
   state.busy = true; state.abort = false;
   $('fetchBtn').textContent = '中止';
+  $('estBtn').disabled = true;
   const client = new XRPLClient(url);
   try {
     setStatus('接続中… ' + url);
@@ -701,6 +709,8 @@ async function run() {
     const saved = loadUserData(me);
     state.edits = new Map(saved.edits);
     state.defPrice = new Map(saved.defPrice);
+    state.est = new Map(saved.est);
+    state.server = url;
     const reg = a => { let x = state.assets.get(a.key); if (!x) { x = Object.assign(a, { count: 0 }); state.assets.set(a.key, x); } x.count++; return x; };
     state.analyzed = txs.map(t => analyzeTx(t, me, meHex, reg, state.pools)).filter(Boolean);
 
@@ -718,7 +728,7 @@ async function run() {
     state.names = defaultNames(state.assets, state.pools);
     for (const [k, v] of saved.names) if (state.assets.has(k)) state.names.set(k, v);
     let msg = `完了：${txs.length}件のトランザクションを取得しました。`;
-    if (saved.edits.length || saved.defPrice.length) msg += '前回の手入力内容を復元しました。';
+    if (saved.edits.length || saved.defPrice.length || saved.est.length) msg += '前回の入力内容を復元しました。';
     const partial = lmin === -1 && minLedger && minLedger > 32570;
     if (partial) msg += `（注意：このノードは ledger ${minLedger} 以降の履歴のみ保持。全履歴ノードで再取得を推奨）`;
     if (lookupFailed) msg += '（期間の検索に失敗したため全履歴を取得しました）';
@@ -737,6 +747,7 @@ async function run() {
     client.close();
     state.busy = false; state.abort = false;
     $('fetchBtn').textContent = '取得';
+    $('estBtn').disabled = false;
   }
 }
 
@@ -814,7 +825,7 @@ function renderMap() {
 
 function ctx() {
   return {
-    me: state.me, names: state.names, pools: state.pools, edits: state.edits, defPrice: state.defPrice,
+    me: state.me, names: state.names, pools: state.pools, edits: state.edits, defPrice: state.defPrice, est: state.est,
     source: cell($('source').value || 'XRPL'),
     own: new Set($('own').value.split(/\s+/).map(s => s.trim()).filter(Boolean)),
     opts: { feeMode: $('feeMode').value, xrpIn: $('xrpIn').value, tokenIn: $('tokenIn').value }
@@ -883,6 +894,7 @@ function pricePlaceholder(r) { return r.needsPrice ? (r.counter === 'JPY' ? '円
 function badgesOf(r) {
   return (r.needsPrice ? '<span class="badge b-warn">価格入力</span>' : '') +
     (r.priceDefault ? '<span class="badge b-ok">既定の単価</span>' : '') +
+    (r.priceEst ? `<span class="badge b-ok" title="${esc(r.estNote)}">推定：${esc(r.estNote)}</span>` : '') +
     (r.flag ? `<span class="badge b-warn">${esc(r.flag)}</span>` : '');
 }
 function renderStats() {
@@ -911,7 +923,157 @@ function download() {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+// ---------- 円単価の自動推定 ----------
+// 円単価 = その時点のトークンのXRP建て価格（XRPL上のAMM・板・自分の取引） × その日のXRP/円終値
+const numStr = x => {
+  if (!isFinite(x) || x < 0) return '';
+  if (x === 0) return '0';
+  return sigTrim(fmt(dec(x.toPrecision(12)), 30), 12);
+};
+const shortNum = x => x >= 1 ? String(+x.toPrecision(6)) : String(+x.toPrecision(4));
+
+// XRP/円の日足（bitbank → だめなら CryptoCompare）
+async function loadXrpJpy(times) {
+  const candles = [];
+  const years = [...new Set(times.map(t => new Date(t + 9 * 3600e3).getUTCFullYear()))];
+  let src = 'bitbank';
+  try {
+    for (const y of years) {
+      if (state.abort) throw Object.assign(new Error('中止しました'), { code: 'aborted' });
+      const res = await fetch(`https://public.bitbank.cc/xrp_jpy/candlestick/1day/${y}`);
+      const j = await res.json();
+      if (!j.success) throw new Error('bitbank');
+      for (const c of j.data.candlestick[0].ohlcv) candles.push({ t: Number(c[5]), close: Number(c[3]) });
+    }
+  } catch (e) {
+    if (e.code === 'aborted') throw e;
+    candles.length = 0; src = 'CryptoCompare';
+    let to = Math.ceil(Math.max(...times) / 1000) + 86400;
+    const from = Math.floor(Math.min(...times) / 1000) - 86400 * 3;
+    while (to > from) {
+      const res = await fetch(`https://min-api.cryptocompare.com/data/v2/histoday?fsym=XRP&tsym=JPY&limit=2000&toTs=${to}`);
+      const j = await res.json();
+      const d = (j.Data && j.Data.Data) || [];
+      if (!d.length) throw new Error('XRP/円の価格データを取得できませんでした');
+      for (const c of d) if (c.close > 0) candles.push({ t: c.time * 1000, close: c.close });
+      to = d[0].time - 1;
+    }
+  }
+  candles.sort((a, b) => a.t - b.t);
+  if (!candles.length) throw new Error('XRP/円の価格データを取得できませんでした');
+  return {
+    src,
+    at(ms) { // その時刻を含む日足の終値
+      let lo = 0, hi = candles.length - 1, k = -1;
+      while (lo <= hi) { const m = (lo + hi) >> 1; if (candles[m].t <= ms) { k = m; lo = m + 1; } else hi = m - 1; }
+      if (k < 0 || ms - candles[k].t > 3 * 86400e3) return null;
+      return candles[k].close;
+    }
+  };
+}
+
+// その時点のトークンのXRP建て価格
+async function tokenXrpPrice(client, asset, ledger, time) {
+  const tok = { currency: asset.currency, issuer: asset.issuer };
+  if (ledger) {
+    try {
+      const r = await client.request({ command: 'amm_info', asset: { currency: 'XRP' }, asset2: tok, ledger_index: ledger });
+      const x = Number(r.amm.amount) / 1e6, t = Number(r.amm.amount2.value);
+      if (x > 0 && t > 0) return { p: x / t, src: 'AMM' };
+    } catch (e) { if (e.code === 'aborted') throw e; }
+    try {
+      const px = o => { const g = o.TakerGets, pays = o.TakerPays; return typeof g === 'string' ? (Number(g) / 1e6) / Number(pays.value) : (Number(pays) / 1e6) / Number(g.value); };
+      const [bid, ask] = await Promise.all([
+        client.request({ command: 'book_offers', taker_gets: { currency: 'XRP' }, taker_pays: tok, ledger_index: ledger, limit: 3 }),
+        client.request({ command: 'book_offers', taker_gets: tok, taker_pays: { currency: 'XRP' }, ledger_index: ledger, limit: 3 })
+      ]);
+      const b = bid.offers && bid.offers[0] ? px(bid.offers[0]) : null;
+      const a = ask.offers && ask.offers[0] ? px(ask.offers[0]) : null;
+      if (b && a && a / b < 3) return { p: (a + b) / 2, src: '板の仲値' };
+      if (b && a) return { p: Math.sqrt(a * b), src: '板（価格差大・要確認）' };
+    } catch (e) { if (e.code === 'aborted') throw e; }
+  }
+  // 自分のXRP建て取引のうち、30日以内で一番近いもの
+  let best = null;
+  for (const r of state.rows) {
+    if (!r.asset || r.asset.key !== asset.key || r.counter !== 'XRP' || !r.price || (r.action !== 'BUY' && r.action !== 'SELL')) continue;
+    const dt = Math.abs(r.time - time);
+    if (dt <= 30 * 86400e3 && (!best || dt < best.dt)) best = { dt, p: Number(r.price) };
+  }
+  if (best) return { p: best.p, src: `自分の取引（${Math.round(best.dt / 86400e3)}日差）` };
+  return null;
+}
+
+async function estimatePrices() {
+  if (state.busy) { state.abort = true; return; }
+  const setE = (m, err) => { $('estStatus').textContent = m; $('estStatus').className = 'status' + (err ? ' err' : ''); };
+  // 対象：期間内で価格が未入力（または前回推定）のJPY建て行。ペア（トークン同士の交換など）は相手の行も含める
+  const vis = visibleRows().filter(r => isExport(r) && r.counter === 'JPY' && r.priceEditable && (r.needsPrice || r.priceEst));
+  if (!vis.length) { setE('推定が必要な行はありません（価格が未入力の行が対象です）'); return; }
+  const groups = new Map();
+  for (const r of vis) {
+    const g = r.group || r.id;
+    if (!groups.has(g)) groups.set(g, r.group ? state.rows.filter(x => x.group === r.group) : [r]);
+  }
+  state.busy = true; state.abort = false;
+  $('estBtn').textContent = '中止'; $('fetchBtn').disabled = true;
+  const client = new XRPLClient(state.server || $('server').value);
+  let ok = 0, ng = 0;
+  try {
+    setE('XRP/円の価格データを取得中…');
+    const fx = await loadXrpJpy([...groups.values()].map(g => g[0].time));
+    setE('接続中…');
+    await client.connect();
+    const cache = new Map();
+    const list = [...groups.values()];
+    let done = 0;
+    const work = async g => {
+      const jpy = fx.at(g[0].time);
+      let est = null;
+      if (jpy) {
+        // ペアのうち、相場が取れるトークン側の円換算額を基準にする
+        for (const r of g) {
+          if (!r.asset || r.asset.type !== 'TOKEN') continue;
+          const k = r.asset.key + '@' + (r.ledger || r.time);
+          if (!cache.has(k)) cache.set(k, tokenXrpPrice(client, r.asset, r.ledger, r.time));
+          const q = await cache.get(k);
+          if (q) { est = { base: r, q, total: q.p * Number(fmt(r.volume)) * jpy }; break; }
+        }
+      }
+      if (est) {
+        for (const r of g) {
+          const vol = Number(fmt(r.volume));
+          if (!vol) continue;
+          const p = r === est.base ? est.q.p * jpy : est.total / vol;
+          const note = r === est.base
+            ? `1${r.base}=${shortNum(est.q.p)}XRP(${est.q.src})×XRP ${shortNum(jpy)}円`
+            : `${est.base.base}の円換算額から按分`;
+          state.est.set(r.id, { price: numStr(p), note });
+        }
+        ok++;
+      } else { g.forEach(r => state.est.delete(r.id)); ng++; }
+      done++;
+      if (done % 5 === 0 || done === list.length) setE(`推定中… ${done}/${list.length}　※「中止」で止められます`);
+    };
+    // 4件ずつ並列
+    let idx = 0;
+    await Promise.all(Array.from({ length: 4 }, async () => {
+      while (idx < list.length) { if (state.abort) throw Object.assign(new Error('中止しました'), { code: 'aborted' }); await work(list[idx++]); }
+    }));
+    setE(`推定しました：${ok}件` + (ng ? `／推定できなかった：${ng}件（相場が見つからない・XRP/円が無い日。手入力してください）` : '') + `。XRP/円は${fx.src}の日足終値です。`, ng > 0);
+  } catch (e) {
+    setE(e.code === 'aborted' ? `推定を中止しました（${ok}件は反映済み）` : 'エラー：' + e.message, e.code !== 'aborted');
+  } finally {
+    client.close();
+    state.busy = false; state.abort = false;
+    $('estBtn').textContent = '円単価を自動推定'; $('fetchBtn').disabled = false;
+    saveUserData();
+    recompute();
+  }
+}
+
 // ---------- イベント ----------
+$('estBtn').addEventListener('click', estimatePrices);
 $('fetchBtn').addEventListener('click', run);
 $('addr').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
 $('server').addEventListener('change', () => $('customServer').classList.toggle('hidden', $('server').value !== 'custom'));
@@ -989,7 +1151,7 @@ $('rows').addEventListener('change', e => {
     // 表を描き直さずにその行だけ更新（Tabで次の欄へ移れるように）
     if (r) {
       if (v === '') { recompute(); return; } // 空欄に戻したときは自動価格・既定単価を再計算
-      r.price = v; r.priceDefault = false; updateNeedsPrice(r);
+      r.price = v; r.priceDefault = false; r.priceEst = false; updateNeedsPrice(r);
       t.value = v; t.placeholder = pricePlaceholder(r);
       const b = t.closest('tr').querySelector('.bdg'); if (b) b.innerHTML = badgesOf(r);
       renderStats();
