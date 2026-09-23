@@ -59,23 +59,7 @@ details summary{cursor:pointer;font-weight:600}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .filters select{width:auto}
 .tip{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.tip-amt{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.chip{background:var(--bg);color:var(--text);border:1px solid var(--line);font-weight:600;padding:7px 14px}
-.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.chip-other{display:inline-flex;gap:6px;align-items:center;margin:0;font-size:14px;color:var(--text)}
-.chip-other input{width:80px;padding:6px 8px}
-.tip-wallets{display:flex;gap:8px;flex-wrap:wrap}
-.wbtn{flex:1 1 170px}
-.qrbox{display:flex;flex-direction:column;gap:8px;align-items:center;flex:none}
-.qrtabs{display:flex;gap:4px}
-.qtab{font-size:12px;padding:5px 9px;background:var(--bg);color:var(--muted);border:1px solid var(--line);font-weight:500}
-.qtab.on{color:var(--accent);border-color:var(--accent);background:var(--accent-weak)}
-.qrnote{font-size:12px;color:var(--muted);text-align:center;max-width:160px}
 .tip .qr{width:148px;height:148px;border-radius:8px;flex:none;border:1px solid var(--line)}
-.tip .qr[hidden]{display:none}
-.mobile-only{display:none}
-body.is-mobile .mobile-only{display:block}
-body.is-mobile .desktop-only{display:none}
 .tip-body{flex:1 1 260px;min-width:0}
 .addr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0}
 .disc{border-color:var(--warn)}
@@ -210,34 +194,13 @@ button:disabled{cursor:not-allowed}
 
   <section class="card" id="tipCard">
     <h2>応援（任意）</h2>
-    <p style="margin:0 0 12px">このツールは無料です。役に立ったと感じていただけたら、お気持ちでXRPを送っていただけると開発・維持の励みになります。</p>
-    <div class="tip-amt" role="group" aria-label="金額">
-      <button class="chip" data-amt="1">1 XRP</button>
-      <button class="chip on" data-amt="5">5 XRP</button>
-      <button class="chip" data-amt="10">10 XRP</button>
-      <label class="chip-other">その他 <input id="tipOther" inputmode="decimal" placeholder="例 3"> XRP</label>
-    </div>
-    <p class="mobile-only" id="mobileTip" style="margin:0 0 8px"></p>
-    <div class="tip-wallets"><button class="wbtn" id="tipXaman" hidden>Xamanで送る</button></div>
-    <div class="tip-wallets desktop-only" style="margin-top:8px">
-      <button class="wbtn" id="tipGem">GemWalletで送る</button>
-      <button class="wbtn" id="tipCross">Crossmarkで送る</button>
-    </div>
-    <p class="muted desktop-only" style="margin:4px 0 0">GemWallet・CrossmarkはPCのChrome等の拡張機能です。押すとウォレットの送金確認画面が開きます。</p>
-    <div id="tipMsg" class="status" style="white-space:pre-line"></div>
-    <div class="tip" style="margin-top:12px">
-      <div class="qrbox">
-        <svg class="qr" hidden data-qr="addr" viewBox="-4 -4 37 37" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="送金用QRコード" shape-rendering="crispEdges"><rect x="-4" y="-4" width="37" height="37" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM8 0h3v1h-3zM13 0h3v1h-3zM17 0h1v1h-1zM20 0h1v1h-1zM22 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM15 1h1v1h-1zM17 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h2v1h-2zM17 2h2v1h-2zM20 2h1v1h-1zM22 2h1v1h-1zM24 2h3v1h-3zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM15 3h1v1h-1zM18 3h2v1h-2zM22 3h1v1h-1zM24 3h3v1h-3zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM10 4h1v1h-1zM15 4h2v1h-2zM18 4h1v1h-1zM22 4h1v1h-1zM24 4h3v1h-3zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h5v1h-5zM17 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h7v1h-7zM9 7h1v1h-1zM13 7h1v1h-1zM18 7h2v1h-2zM0 8h1v1h-1zM2 8h1v1h-1zM6 8h2v1h-2zM9 8h1v1h-1zM13 8h1v1h-1zM15 8h2v1h-2zM20 8h1v1h-1zM23 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM1 9h3v1h-3zM5 9h1v1h-1zM18 9h3v1h-3zM23 9h1v1h-1zM26 9h2v1h-2zM1 10h3v1h-3zM6 10h3v1h-3zM10 10h2v1h-2zM13 10h3v1h-3zM17 10h4v1h-4zM22 10h4v1h-4zM28 10h1v1h-1zM2 11h4v1h-4zM7 11h1v1h-1zM10 11h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM16 11h1v1h-1zM18 11h2v1h-2zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM3 12h1v1h-1zM5 12h3v1h-3zM12 12h3v1h-3zM16 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM28 12h1v1h-1zM0 13h1v1h-1zM3 13h2v1h-2zM9 13h2v1h-2zM12 13h5v1h-5zM18 13h5v1h-5zM25 13h1v1h-1zM28 13h1v1h-1zM4 14h4v1h-4zM12 14h1v1h-1zM15 14h2v1h-2zM18 14h2v1h-2zM22 14h4v1h-4zM28 14h1v1h-1zM3 15h1v1h-1zM7 15h2v1h-2zM11 15h3v1h-3zM15 15h2v1h-2zM19 15h5v1h-5zM25 15h1v1h-1zM28 15h1v1h-1zM0 16h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h5v1h-5zM13 16h1v1h-1zM15 16h2v1h-2zM18 16h2v1h-2zM22 16h1v1h-1zM24 16h2v1h-2zM4 17h2v1h-2zM7 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM16 17h1v1h-1zM18 17h2v1h-2zM23 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM0 18h2v1h-2zM3 18h2v1h-2zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h6v1h-6zM17 18h1v1h-1zM19 18h1v1h-1zM23 18h2v1h-2zM28 18h1v1h-1zM4 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM14 19h3v1h-3zM19 19h2v1h-2zM22 19h2v1h-2zM25 19h1v1h-1zM28 19h1v1h-1zM0 20h4v1h-4zM6 20h3v1h-3zM10 20h2v1h-2zM13 20h3v1h-3zM19 20h10v1h-10zM8 21h2v1h-2zM11 21h1v1h-1zM13 21h5v1h-5zM19 21h2v1h-2zM24 21h1v1h-1zM27 21h2v1h-2zM0 22h7v1h-7zM8 22h1v1h-1zM15 22h1v1h-1zM18 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM28 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM10 23h4v1h-4zM15 23h1v1h-1zM19 23h2v1h-2zM24 23h2v1h-2zM28 23h1v1h-1zM0 24h1v1h-1zM2 24h3v1h-3zM6 24h1v1h-1zM12 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM19 24h10v1h-10zM0 25h1v1h-1zM2 25h3v1h-3zM6 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM18 25h2v1h-2zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h3v1h-3zM6 26h1v1h-1zM8 26h2v1h-2zM11 26h5v1h-5zM18 26h1v1h-1zM20 26h3v1h-3zM24 26h1v1h-1zM27 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h3v1h-3zM14 27h1v1h-1zM18 27h1v1h-1zM20 27h2v1h-2zM24 27h2v1h-2zM0 28h7v1h-7zM8 28h3v1h-3zM13 28h2v1h-2zM16 28h1v1h-1zM20 28h3v1h-3zM25 28h1v1h-1zM28 28h1v1h-1z"/></svg><svg class="qr" hidden data-qr="a1" viewBox="-4 -4 45 45" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="送金用QRコード" shape-rendering="crispEdges"><rect x="-4" y="-4" width="45" height="45" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM8 0h1v1h-1zM11 0h1v1h-1zM16 0h4v1h-4zM21 0h1v1h-1zM25 0h1v1h-1zM30 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM11 1h2v1h-2zM15 1h4v1h-4zM20 1h1v1h-1zM22 1h1v1h-1zM24 1h1v1h-1zM26 1h1v1h-1zM28 1h1v1h-1zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM10 2h2v1h-2zM14 2h3v1h-3zM20 2h4v1h-4zM25 2h1v1h-1zM28 2h1v1h-1zM30 2h1v1h-1zM32 2h3v1h-3zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h2v1h-2zM13 3h1v1h-1zM16 3h1v1h-1zM19 3h3v1h-3zM23 3h1v1h-1zM25 3h1v1h-1zM30 3h1v1h-1zM32 3h3v1h-3zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM15 4h1v1h-1zM17 4h2v1h-2zM21 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM30 4h1v1h-1zM32 4h3v1h-3zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM9 5h3v1h-3zM14 5h5v1h-5zM20 5h1v1h-1zM23 5h1v1h-1zM25 5h2v1h-2zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h7v1h-7zM9 7h1v1h-1zM11 7h2v1h-2zM15 7h2v1h-2zM20 7h1v1h-1zM23 7h1v1h-1zM25 7h1v1h-1zM27 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM10 8h2v1h-2zM15 8h2v1h-2zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h5v1h-5zM29 8h1v1h-1zM32 8h1v1h-1zM34 8h3v1h-3zM0 9h2v1h-2zM5 9h1v1h-1zM8 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM20 9h2v1h-2zM23 9h1v1h-1zM26 9h4v1h-4zM31 9h5v1h-5zM4 10h7v1h-7zM12 10h3v1h-3zM18 10h1v1h-1zM22 10h2v1h-2zM25 10h1v1h-1zM27 10h3v1h-3zM31 10h1v1h-1zM34 10h1v1h-1zM36 10h1v1h-1zM1 11h3v1h-3zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h2v1h-2zM12 11h1v1h-1zM15 11h1v1h-1zM17 11h1v1h-1zM23 11h1v1h-1zM26 11h1v1h-1zM28 11h3v1h-3zM32 11h1v1h-1zM34 11h3v1h-3zM1 12h1v1h-1zM6 12h2v1h-2zM9 12h1v1h-1zM13 12h1v1h-1zM16 12h1v1h-1zM19 12h2v1h-2zM22 12h2v1h-2zM26 12h1v1h-1zM28 12h1v1h-1zM30 12h1v1h-1zM36 12h1v1h-1zM4 13h1v1h-1zM7 13h1v1h-1zM10 13h1v1h-1zM16 13h3v1h-3zM21 13h9v1h-9zM32 13h2v1h-2zM35 13h1v1h-1zM0 14h1v1h-1zM3 14h2v1h-2zM6 14h1v1h-1zM8 14h6v1h-6zM15 14h1v1h-1zM17 14h1v1h-1zM19 14h1v1h-1zM21 14h1v1h-1zM24 14h1v1h-1zM26 14h3v1h-3zM30 14h1v1h-1zM32 14h5v1h-5zM3 15h1v1h-1zM5 15h1v1h-1zM9 15h1v1h-1zM11 15h1v1h-1zM13 15h3v1h-3zM17 15h3v1h-3zM26 15h2v1h-2zM29 15h3v1h-3zM33 15h4v1h-4zM0 16h1v1h-1zM3 16h4v1h-4zM8 16h3v1h-3zM13 16h5v1h-5zM20 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM29 16h2v1h-2zM32 16h1v1h-1zM34 16h1v1h-1zM36 16h1v1h-1zM0 17h3v1h-3zM5 17h1v1h-1zM7 17h2v1h-2zM11 17h1v1h-1zM14 17h1v1h-1zM16 17h1v1h-1zM18 17h1v1h-1zM20 17h2v1h-2zM25 17h1v1h-1zM27 17h1v1h-1zM31 17h1v1h-1zM33 17h2v1h-2zM2 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM11 18h1v1h-1zM13 18h3v1h-3zM20 18h2v1h-2zM23 18h1v1h-1zM27 18h1v1h-1zM29 18h3v1h-3zM36 18h1v1h-1zM2 19h1v1h-1zM4 19h2v1h-2zM7 19h2v1h-2zM10 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM25 19h1v1h-1zM27 19h1v1h-1zM31 19h3v1h-3zM36 19h1v1h-1zM0 20h2v1h-2zM3 20h2v1h-2zM6 20h3v1h-3zM11 20h2v1h-2zM14 20h2v1h-2zM17 20h1v1h-1zM20 20h1v1h-1zM23 20h2v1h-2zM27 20h6v1h-6zM0 21h1v1h-1zM2 21h4v1h-4zM8 21h2v1h-2zM12 21h1v1h-1zM15 21h1v1h-1zM19 21h1v1h-1zM23 21h1v1h-1zM25 21h5v1h-5zM32 21h1v1h-1zM34 21h1v1h-1zM3 22h4v1h-4zM12 22h1v1h-1zM14 22h5v1h-5zM20 22h2v1h-2zM23 22h2v1h-2zM27 22h1v1h-1zM29 22h3v1h-3zM33 22h1v1h-1zM36 22h1v1h-1zM0 23h1v1h-1zM2 23h1v1h-1zM5 23h1v1h-1zM7 23h2v1h-2zM10 23h2v1h-2zM17 23h1v1h-1zM19 23h1v1h-1zM26 23h2v1h-2zM29 23h1v1h-1zM31 23h6v1h-6zM0 24h2v1h-2zM4 24h4v1h-4zM9 24h3v1h-3zM14 24h5v1h-5zM21 24h2v1h-2zM24 24h1v1h-1zM26 24h2v1h-2zM29 24h2v1h-2zM36 24h1v1h-1zM0 25h2v1h-2zM3 25h1v1h-1zM8 25h1v1h-1zM11 25h4v1h-4zM16 25h1v1h-1zM19 25h2v1h-2zM23 25h1v1h-1zM26 25h1v1h-1zM28 25h2v1h-2zM31 25h2v1h-2zM34 25h1v1h-1zM0 26h2v1h-2zM3 26h1v1h-1zM5 26h3v1h-3zM9 26h3v1h-3zM16 26h1v1h-1zM19 26h2v1h-2zM22 26h1v1h-1zM26 26h3v1h-3zM30 26h4v1h-4zM35 26h2v1h-2zM0 27h1v1h-1zM3 27h1v1h-1zM7 27h2v1h-2zM11 27h2v1h-2zM15 27h1v1h-1zM18 27h1v1h-1zM20 27h1v1h-1zM22 27h1v1h-1zM27 27h2v1h-2zM30 27h1v1h-1zM33 27h2v1h-2zM0 28h1v1h-1zM2 28h2v1h-2zM5 28h3v1h-3zM9 28h2v1h-2zM12 28h1v1h-1zM14 28h1v1h-1zM17 28h1v1h-1zM22 28h1v1h-1zM24 28h2v1h-2zM28 28h7v1h-7zM36 28h1v1h-1zM8 29h4v1h-4zM20 29h1v1h-1zM22 29h1v1h-1zM26 29h1v1h-1zM28 29h1v1h-1zM32 29h1v1h-1zM34 29h3v1h-3zM0 30h7v1h-7zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM14 30h3v1h-3zM19 30h5v1h-5zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM36 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM8 31h1v1h-1zM13 31h2v1h-2zM16 31h4v1h-4zM25 31h4v1h-4zM32 31h1v1h-1zM0 32h1v1h-1zM2 32h3v1h-3zM6 32h1v1h-1zM8 32h2v1h-2zM13 32h3v1h-3zM19 32h1v1h-1zM21 32h2v1h-2zM24 32h1v1h-1zM26 32h7v1h-7zM35 32h1v1h-1zM0 33h1v1h-1zM2 33h3v1h-3zM6 33h1v1h-1zM8 33h4v1h-4zM16 33h1v1h-1zM18 33h1v1h-1zM21 33h3v1h-3zM26 33h1v1h-1zM28 33h3v1h-3zM36 33h1v1h-1zM0 34h1v1h-1zM2 34h3v1h-3zM6 34h1v1h-1zM9 34h1v1h-1zM13 34h1v1h-1zM15 34h3v1h-3zM19 34h2v1h-2zM22 34h2v1h-2zM25 34h2v1h-2zM28 34h2v1h-2zM32 34h1v1h-1zM34 34h1v1h-1zM36 34h1v1h-1zM0 35h1v1h-1zM6 35h1v1h-1zM9 35h1v1h-1zM12 35h1v1h-1zM16 35h5v1h-5zM22 35h3v1h-3zM26 35h1v1h-1zM30 35h1v1h-1zM32 35h5v1h-5zM0 36h7v1h-7zM8 36h1v1h-1zM13 36h1v1h-1zM15 36h1v1h-1zM18 36h1v1h-1zM20 36h1v1h-1zM23 36h2v1h-2zM28 36h4v1h-4zM33 36h1v1h-1zM36 36h1v1h-1z"/></svg><svg class="qr" data-qr="a5" viewBox="-4 -4 45 45" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="送金用QRコード" shape-rendering="crispEdges"><rect x="-4" y="-4" width="45" height="45" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM10 0h2v1h-2zM13 0h2v1h-2zM18 0h1v1h-1zM20 0h4v1h-4zM26 0h1v1h-1zM28 0h1v1h-1zM30 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM9 1h1v1h-1zM11 1h5v1h-5zM17 1h3v1h-3zM21 1h2v1h-2zM24 1h2v1h-2zM27 1h2v1h-2zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h3v1h-3zM19 2h3v1h-3zM23 2h1v1h-1zM30 2h1v1h-1zM32 2h3v1h-3zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM13 3h3v1h-3zM19 3h1v1h-1zM22 3h2v1h-2zM25 3h4v1h-4zM30 3h1v1h-1zM32 3h3v1h-3zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM13 4h3v1h-3zM18 4h1v1h-1zM20 4h2v1h-2zM23 4h1v1h-1zM28 4h1v1h-1zM30 4h1v1h-1zM32 4h3v1h-3zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h2v1h-2zM18 5h1v1h-1zM20 5h3v1h-3zM25 5h4v1h-4zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h7v1h-7zM8 7h1v1h-1zM11 7h4v1h-4zM16 7h1v1h-1zM19 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM0 8h1v1h-1zM2 8h5v1h-5zM11 8h3v1h-3zM15 8h1v1h-1zM18 8h3v1h-3zM23 8h2v1h-2zM26 8h1v1h-1zM28 8h1v1h-1zM30 8h5v1h-5zM0 9h1v1h-1zM2 9h4v1h-4zM7 9h3v1h-3zM11 9h1v1h-1zM13 9h4v1h-4zM22 9h2v1h-2zM29 9h1v1h-1zM31 9h1v1h-1zM35 9h1v1h-1zM2 10h3v1h-3zM6 10h1v1h-1zM8 10h6v1h-6zM17 10h2v1h-2zM20 10h1v1h-1zM22 10h1v1h-1zM25 10h4v1h-4zM31 10h2v1h-2zM34 10h3v1h-3zM1 11h1v1h-1zM4 11h1v1h-1zM12 11h1v1h-1zM16 11h1v1h-1zM21 11h2v1h-2zM26 11h2v1h-2zM30 11h1v1h-1zM32 11h2v1h-2zM36 11h1v1h-1zM4 12h3v1h-3zM8 12h3v1h-3zM14 12h1v1h-1zM17 12h1v1h-1zM25 12h1v1h-1zM29 12h4v1h-4zM34 12h3v1h-3zM1 13h4v1h-4zM8 13h3v1h-3zM13 13h8v1h-8zM22 13h3v1h-3zM28 13h2v1h-2zM31 13h1v1h-1zM35 13h1v1h-1zM0 14h2v1h-2zM3 14h2v1h-2zM6 14h3v1h-3zM10 14h4v1h-4zM15 14h3v1h-3zM21 14h2v1h-2zM24 14h4v1h-4zM30 14h4v1h-4zM35 14h2v1h-2zM1 15h2v1h-2zM4 15h1v1h-1zM8 15h4v1h-4zM13 15h1v1h-1zM16 15h7v1h-7zM28 15h5v1h-5zM35 15h2v1h-2zM2 16h1v1h-1zM5 16h2v1h-2zM11 16h1v1h-1zM14 16h3v1h-3zM25 16h2v1h-2zM30 16h1v1h-1zM34 16h3v1h-3zM0 17h6v1h-6zM8 17h2v1h-2zM12 17h1v1h-1zM14 17h2v1h-2zM17 17h2v1h-2zM20 17h1v1h-1zM22 17h2v1h-2zM25 17h1v1h-1zM28 17h2v1h-2zM31 17h1v1h-1zM35 17h1v1h-1zM1 18h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM10 18h3v1h-3zM15 18h3v1h-3zM19 18h1v1h-1zM21 18h2v1h-2zM25 18h4v1h-4zM30 18h1v1h-1zM32 18h1v1h-1zM34 18h3v1h-3zM1 19h1v1h-1zM4 19h2v1h-2zM7 19h7v1h-7zM15 19h1v1h-1zM18 19h6v1h-6zM26 19h1v1h-1zM36 19h1v1h-1zM0 20h1v1h-1zM2 20h2v1h-2zM6 20h3v1h-3zM10 20h1v1h-1zM12 20h6v1h-6zM19 20h2v1h-2zM22 20h4v1h-4zM27 20h1v1h-1zM29 20h2v1h-2zM32 20h1v1h-1zM34 20h1v1h-1zM4 21h2v1h-2zM10 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM19 21h5v1h-5zM25 21h1v1h-1zM29 21h1v1h-1zM33 21h1v1h-1zM0 22h1v1h-1zM2 22h2v1h-2zM5 22h2v1h-2zM8 22h5v1h-5zM14 22h3v1h-3zM18 22h1v1h-1zM21 22h2v1h-2zM24 22h1v1h-1zM26 22h2v1h-2zM30 22h4v1h-4zM35 22h2v1h-2zM1 23h5v1h-5zM7 23h2v1h-2zM10 23h1v1h-1zM14 23h3v1h-3zM19 23h1v1h-1zM21 23h3v1h-3zM26 23h1v1h-1zM28 23h1v1h-1zM31 23h2v1h-2zM36 23h1v1h-1zM0 24h4v1h-4zM6 24h1v1h-1zM10 24h1v1h-1zM13 24h3v1h-3zM18 24h4v1h-4zM23 24h3v1h-3zM27 24h2v1h-2zM30 24h3v1h-3zM34 24h3v1h-3zM0 25h1v1h-1zM3 25h1v1h-1zM5 25h1v1h-1zM7 25h1v1h-1zM9 25h1v1h-1zM11 25h2v1h-2zM15 25h2v1h-2zM21 25h1v1h-1zM23 25h1v1h-1zM25 25h1v1h-1zM27 25h3v1h-3zM33 25h2v1h-2zM0 26h1v1h-1zM3 26h7v1h-7zM12 26h2v1h-2zM20 26h1v1h-1zM25 26h3v1h-3zM30 26h1v1h-1zM32 26h5v1h-5zM0 27h1v1h-1zM2 27h3v1h-3zM9 27h2v1h-2zM14 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM21 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM32 27h1v1h-1zM0 28h1v1h-1zM2 28h2v1h-2zM6 28h1v1h-1zM8 28h5v1h-5zM20 28h1v1h-1zM22 28h5v1h-5zM28 28h9v1h-9zM8 29h2v1h-2zM13 29h1v1h-1zM15 29h3v1h-3zM20 29h2v1h-2zM23 29h1v1h-1zM26 29h3v1h-3zM32 29h2v1h-2zM36 29h1v1h-1zM0 30h7v1h-7zM11 30h3v1h-3zM15 30h1v1h-1zM17 30h1v1h-1zM21 30h1v1h-1zM25 30h2v1h-2zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM34 30h3v1h-3zM0 31h1v1h-1zM6 31h1v1h-1zM8 31h1v1h-1zM13 31h1v1h-1zM15 31h4v1h-4zM20 31h2v1h-2zM28 31h1v1h-1zM32 31h2v1h-2zM0 32h1v1h-1zM2 32h3v1h-3zM6 32h1v1h-1zM8 32h1v1h-1zM10 32h1v1h-1zM12 32h5v1h-5zM21 32h1v1h-1zM24 32h9v1h-9zM34 32h2v1h-2zM0 33h1v1h-1zM2 33h3v1h-3zM6 33h1v1h-1zM8 33h1v1h-1zM10 33h1v1h-1zM12 33h1v1h-1zM15 33h1v1h-1zM18 33h1v1h-1zM20 33h1v1h-1zM23 33h1v1h-1zM27 33h1v1h-1zM29 33h2v1h-2zM32 33h3v1h-3zM36 33h1v1h-1zM0 34h1v1h-1zM2 34h3v1h-3zM6 34h1v1h-1zM8 34h2v1h-2zM13 34h4v1h-4zM19 34h1v1h-1zM22 34h1v1h-1zM25 34h1v1h-1zM28 34h1v1h-1zM34 34h3v1h-3zM0 35h1v1h-1zM6 35h1v1h-1zM10 35h2v1h-2zM15 35h1v1h-1zM18 35h4v1h-4zM24 35h1v1h-1zM26 35h5v1h-5zM32 35h1v1h-1zM36 35h1v1h-1zM0 36h7v1h-7zM8 36h1v1h-1zM10 36h1v1h-1zM14 36h6v1h-6zM22 36h1v1h-1zM24 36h3v1h-3zM30 36h1v1h-1zM32 36h5v1h-5z"/></svg><svg class="qr" hidden data-qr="a10" viewBox="-4 -4 45 45" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="送金用QRコード" shape-rendering="crispEdges"><rect x="-4" y="-4" width="45" height="45" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM8 0h3v1h-3zM13 0h1v1h-1zM17 0h1v1h-1zM19 0h3v1h-3zM25 0h1v1h-1zM30 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM10 1h4v1h-4zM15 1h1v1h-1zM17 1h3v1h-3zM22 1h1v1h-1zM24 1h1v1h-1zM26 1h1v1h-1zM28 1h1v1h-1zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM11 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM19 2h1v1h-1zM21 2h3v1h-3zM25 2h1v1h-1zM28 2h1v1h-1zM30 2h1v1h-1zM32 2h3v1h-3zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM10 3h1v1h-1zM15 3h2v1h-2zM20 3h2v1h-2zM23 3h1v1h-1zM25 3h1v1h-1zM30 3h1v1h-1zM32 3h3v1h-3zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h2v1h-2zM11 4h1v1h-1zM13 4h4v1h-4zM18 4h1v1h-1zM21 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM30 4h1v1h-1zM32 4h3v1h-3zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM9 5h7v1h-7zM20 5h1v1h-1zM23 5h1v1h-1zM25 5h2v1h-2zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h7v1h-7zM11 7h2v1h-2zM16 7h3v1h-3zM20 7h1v1h-1zM23 7h1v1h-1zM25 7h1v1h-1zM27 7h2v1h-2zM0 8h1v1h-1zM3 8h9v1h-9zM13 8h2v1h-2zM22 8h5v1h-5zM29 8h1v1h-1zM32 8h1v1h-1zM34 8h3v1h-3zM0 9h3v1h-3zM5 9h1v1h-1zM7 9h1v1h-1zM9 9h2v1h-2zM14 9h1v1h-1zM16 9h1v1h-1zM18 9h1v1h-1zM21 9h1v1h-1zM23 9h1v1h-1zM26 9h4v1h-4zM31 9h5v1h-5zM1 10h1v1h-1zM4 10h4v1h-4zM13 10h4v1h-4zM18 10h3v1h-3zM22 10h2v1h-2zM25 10h1v1h-1zM27 10h3v1h-3zM31 10h1v1h-1zM34 10h1v1h-1zM36 10h1v1h-1zM1 11h5v1h-5zM8 11h2v1h-2zM11 11h1v1h-1zM14 11h1v1h-1zM16 11h2v1h-2zM19 11h2v1h-2zM23 11h1v1h-1zM26 11h1v1h-1zM28 11h3v1h-3zM32 11h1v1h-1zM34 11h3v1h-3zM0 12h3v1h-3zM4 12h3v1h-3zM8 12h1v1h-1zM10 12h7v1h-7zM20 12h1v1h-1zM22 12h2v1h-2zM26 12h1v1h-1zM28 12h1v1h-1zM30 12h1v1h-1zM36 12h1v1h-1zM2 13h2v1h-2zM8 13h1v1h-1zM10 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM18 13h1v1h-1zM21 13h9v1h-9zM32 13h2v1h-2zM35 13h1v1h-1zM1 14h2v1h-2zM5 14h3v1h-3zM11 14h2v1h-2zM14 14h2v1h-2zM18 14h2v1h-2zM21 14h1v1h-1zM24 14h1v1h-1zM26 14h3v1h-3zM30 14h1v1h-1zM32 14h5v1h-5zM0 15h2v1h-2zM4 15h2v1h-2zM9 15h1v1h-1zM13 15h3v1h-3zM19 15h1v1h-1zM26 15h2v1h-2zM29 15h3v1h-3zM33 15h4v1h-4zM0 16h4v1h-4zM6 16h1v1h-1zM9 16h3v1h-3zM15 16h1v1h-1zM17 16h2v1h-2zM23 16h1v1h-1zM25 16h1v1h-1zM29 16h2v1h-2zM32 16h1v1h-1zM34 16h1v1h-1zM36 16h1v1h-1zM0 17h1v1h-1zM4 17h2v1h-2zM8 17h4v1h-4zM13 17h1v1h-1zM21 17h1v1h-1zM25 17h1v1h-1zM27 17h1v1h-1zM31 17h1v1h-1zM33 17h2v1h-2zM0 18h1v1h-1zM2 18h2v1h-2zM6 18h3v1h-3zM12 18h1v1h-1zM14 18h1v1h-1zM16 18h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM23 18h1v1h-1zM27 18h1v1h-1zM29 18h3v1h-3zM36 18h1v1h-1zM0 19h3v1h-3zM4 19h2v1h-2zM7 19h2v1h-2zM11 19h2v1h-2zM15 19h2v1h-2zM18 19h3v1h-3zM22 19h2v1h-2zM25 19h1v1h-1zM27 19h1v1h-1zM31 19h3v1h-3zM36 19h1v1h-1zM0 20h4v1h-4zM5 20h2v1h-2zM9 20h2v1h-2zM13 20h1v1h-1zM17 20h1v1h-1zM19 20h2v1h-2zM23 20h2v1h-2zM27 20h6v1h-6zM1 21h1v1h-1zM8 21h4v1h-4zM14 21h2v1h-2zM17 21h1v1h-1zM19 21h1v1h-1zM23 21h1v1h-1zM25 21h5v1h-5zM32 21h1v1h-1zM34 21h1v1h-1zM0 22h2v1h-2zM3 22h4v1h-4zM9 22h1v1h-1zM13 22h1v1h-1zM15 22h2v1h-2zM20 22h2v1h-2zM23 22h2v1h-2zM27 22h1v1h-1zM29 22h3v1h-3zM33 22h1v1h-1zM36 22h1v1h-1zM2 23h2v1h-2zM5 23h1v1h-1zM11 23h2v1h-2zM18 23h2v1h-2zM26 23h2v1h-2zM29 23h1v1h-1zM31 23h6v1h-6zM0 24h1v1h-1zM4 24h5v1h-5zM10 24h1v1h-1zM13 24h1v1h-1zM15 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h1v1h-1zM26 24h2v1h-2zM29 24h2v1h-2zM36 24h1v1h-1zM0 25h1v1h-1zM3 25h1v1h-1zM8 25h2v1h-2zM11 25h1v1h-1zM13 25h2v1h-2zM18 25h2v1h-2zM22 25h2v1h-2zM26 25h1v1h-1zM28 25h2v1h-2zM31 25h2v1h-2zM34 25h1v1h-1zM0 26h2v1h-2zM3 26h1v1h-1zM5 26h2v1h-2zM8 26h1v1h-1zM14 26h2v1h-2zM22 26h1v1h-1zM26 26h3v1h-3zM30 26h4v1h-4zM35 26h2v1h-2zM0 27h1v1h-1zM2 27h1v1h-1zM5 27h1v1h-1zM7 27h2v1h-2zM10 27h1v1h-1zM12 27h1v1h-1zM16 27h1v1h-1zM18 27h2v1h-2zM22 27h1v1h-1zM27 27h2v1h-2zM30 27h1v1h-1zM33 27h3v1h-3zM0 28h1v1h-1zM2 28h1v1h-1zM4 28h1v1h-1zM6 28h3v1h-3zM12 28h2v1h-2zM15 28h1v1h-1zM17 28h1v1h-1zM19 28h1v1h-1zM22 28h1v1h-1zM24 28h2v1h-2zM28 28h7v1h-7zM36 28h1v1h-1zM8 29h3v1h-3zM13 29h2v1h-2zM17 29h1v1h-1zM20 29h1v1h-1zM22 29h1v1h-1zM26 29h1v1h-1zM28 29h1v1h-1zM32 29h1v1h-1zM34 29h3v1h-3zM0 30h7v1h-7zM8 30h5v1h-5zM15 30h9v1h-9zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM36 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM8 31h4v1h-4zM14 31h1v1h-1zM16 31h1v1h-1zM19 31h1v1h-1zM25 31h4v1h-4zM32 31h1v1h-1zM0 32h1v1h-1zM2 32h3v1h-3zM6 32h1v1h-1zM8 32h1v1h-1zM10 32h2v1h-2zM13 32h4v1h-4zM18 32h2v1h-2zM21 32h2v1h-2zM24 32h1v1h-1zM26 32h7v1h-7zM35 32h1v1h-1zM0 33h1v1h-1zM2 33h3v1h-3zM6 33h1v1h-1zM8 33h1v1h-1zM11 33h2v1h-2zM14 33h1v1h-1zM20 33h4v1h-4zM26 33h1v1h-1zM28 33h3v1h-3zM36 33h1v1h-1zM0 34h1v1h-1zM2 34h3v1h-3zM6 34h1v1h-1zM11 34h3v1h-3zM17 34h1v1h-1zM20 34h1v1h-1zM22 34h2v1h-2zM25 34h2v1h-2zM28 34h2v1h-2zM32 34h1v1h-1zM34 34h1v1h-1zM36 34h1v1h-1zM0 35h1v1h-1zM6 35h1v1h-1zM9 35h2v1h-2zM13 35h3v1h-3zM17 35h2v1h-2zM22 35h3v1h-3zM26 35h1v1h-1zM30 35h1v1h-1zM32 35h5v1h-5zM0 36h7v1h-7zM8 36h2v1h-2zM11 36h2v1h-2zM18 36h3v1h-3zM23 36h2v1h-2zM28 36h4v1h-4zM33 36h1v1h-1zM36 36h1v1h-1z"/></svg>
-        <div class="qrtabs" role="tablist">
-          <button class="qtab on" data-mode="amt" role="tab">金額入り（Xaman）</button>
-          <button class="qtab" data-mode="addr" role="tab">アドレスのみ</button>
-        </div>
-      </div>
+    <div class="tip">
+      <svg class="qr" viewBox="-4 -4 37 37" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="送金用QRコード" shape-rendering="crispEdges"><rect x="-4" y="-4" width="37" height="37" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM8 0h3v1h-3zM13 0h3v1h-3zM17 0h1v1h-1zM20 0h1v1h-1zM22 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM15 1h1v1h-1zM17 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h2v1h-2zM17 2h2v1h-2zM20 2h1v1h-1zM22 2h1v1h-1zM24 2h3v1h-3zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM15 3h1v1h-1zM18 3h2v1h-2zM22 3h1v1h-1zM24 3h3v1h-3zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM10 4h1v1h-1zM15 4h2v1h-2zM18 4h1v1h-1zM22 4h1v1h-1zM24 4h3v1h-3zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h5v1h-5zM17 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h7v1h-7zM9 7h1v1h-1zM13 7h1v1h-1zM18 7h2v1h-2zM0 8h1v1h-1zM2 8h1v1h-1zM6 8h2v1h-2zM9 8h1v1h-1zM13 8h1v1h-1zM15 8h2v1h-2zM20 8h1v1h-1zM23 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM1 9h3v1h-3zM5 9h1v1h-1zM18 9h3v1h-3zM23 9h1v1h-1zM26 9h2v1h-2zM1 10h3v1h-3zM6 10h3v1h-3zM10 10h2v1h-2zM13 10h3v1h-3zM17 10h4v1h-4zM22 10h4v1h-4zM28 10h1v1h-1zM2 11h4v1h-4zM7 11h1v1h-1zM10 11h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM16 11h1v1h-1zM18 11h2v1h-2zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM3 12h1v1h-1zM5 12h3v1h-3zM12 12h3v1h-3zM16 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM28 12h1v1h-1zM0 13h1v1h-1zM3 13h2v1h-2zM9 13h2v1h-2zM12 13h5v1h-5zM18 13h5v1h-5zM25 13h1v1h-1zM28 13h1v1h-1zM4 14h4v1h-4zM12 14h1v1h-1zM15 14h2v1h-2zM18 14h2v1h-2zM22 14h4v1h-4zM28 14h1v1h-1zM3 15h1v1h-1zM7 15h2v1h-2zM11 15h3v1h-3zM15 15h2v1h-2zM19 15h5v1h-5zM25 15h1v1h-1zM28 15h1v1h-1zM0 16h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h5v1h-5zM13 16h1v1h-1zM15 16h2v1h-2zM18 16h2v1h-2zM22 16h1v1h-1zM24 16h2v1h-2zM4 17h2v1h-2zM7 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM16 17h1v1h-1zM18 17h2v1h-2zM23 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM0 18h2v1h-2zM3 18h2v1h-2zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h6v1h-6zM17 18h1v1h-1zM19 18h1v1h-1zM23 18h2v1h-2zM28 18h1v1h-1zM4 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM14 19h3v1h-3zM19 19h2v1h-2zM22 19h2v1h-2zM25 19h1v1h-1zM28 19h1v1h-1zM0 20h4v1h-4zM6 20h3v1h-3zM10 20h2v1h-2zM13 20h3v1h-3zM19 20h10v1h-10zM8 21h2v1h-2zM11 21h1v1h-1zM13 21h5v1h-5zM19 21h2v1h-2zM24 21h1v1h-1zM27 21h2v1h-2zM0 22h7v1h-7zM8 22h1v1h-1zM15 22h1v1h-1zM18 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM28 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM10 23h4v1h-4zM15 23h1v1h-1zM19 23h2v1h-2zM24 23h2v1h-2zM28 23h1v1h-1zM0 24h1v1h-1zM2 24h3v1h-3zM6 24h1v1h-1zM12 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM19 24h10v1h-10zM0 25h1v1h-1zM2 25h3v1h-3zM6 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM18 25h2v1h-2zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h3v1h-3zM6 26h1v1h-1zM8 26h2v1h-2zM11 26h5v1h-5zM18 26h1v1h-1zM20 26h3v1h-3zM24 26h1v1h-1zM27 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h3v1h-3zM14 27h1v1h-1zM18 27h1v1h-1zM20 27h2v1h-2zM24 27h2v1h-2zM0 28h7v1h-7zM8 28h3v1h-3zM13 28h2v1h-2zM16 28h1v1h-1zM20 28h3v1h-3zM25 28h1v1h-1zM28 28h1v1h-1z"/></svg>
       <div class="tip-body">
-        <p style="margin:0" id="qrHelp">スマホのXamanで読み取ると、送金先と金額が入力された状態で開きます。</p>
+        <p style="margin:0">このツールは無料です。役に立ったと感じていただけたら、お気持ちでXRPを送っていただけると開発・維持の励みになります。</p>
         <div class="addr" id="tipAddr">rndZvkCCntT4EwNDew7zkj2Kq24jSi3wFm</div>
         <button class="sec" id="copyTip">アドレスをコピー</button>
-        <p class="muted" style="margin:8px 0 0">Joey Wallet・Bifrost・取引所アプリなど他のウォレットは「アドレスのみ」のQRを読み取るか、アドレスをコピーして送金してください。送金は任意で、送らなくても機能や利用条件は変わりません。宛先タグは不要です。送金前にアドレスの先頭と末尾が一致しているかご確認ください。送金の取消・返金はできません。</p>
+        <p class="muted" style="margin:8px 0 0">送金は任意で、送らなくても機能や利用条件は変わりません。宛先タグは不要です。送金前にアドレスの先頭と末尾が一致しているかご確認ください。送金の取消・返金はできません。</p>
       </div>
     </div>
   </section>
@@ -1355,129 +1318,6 @@ $('rows').addEventListener('keydown', e => {
   const next = $('rows').querySelectorAll('input.price')[i + 1]; // 描き直された場合に備えて取り直す
   if (next) { next.focus(); next.select(); }
 });
-// ---------- 応援（XRP送金） ----------
-const TIP_ADDR = 'rndZvkCCntT4EwNDew7zkj2Kq24jSi3wFm';
-// Xamanの開発者コンソール（apps.xaman.dev）で発行したAPIキー。公開して問題ない値。空ならXamanボタンは出さない
-const XAMAN_API_KEY = '';
-const TIP_MEMO = 'XRPL Tax Export 応援';
-const QR_AMOUNTS = ['1', '5', '10'];
-const tipState = { amt: '5', mode: 'amt' };
-const hexOf = str => [...new TextEncoder().encode(str)].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-const tipMemo = () => ({ type: hexOf('text/plain'), data: hexOf(TIP_MEMO) });
-function setTipMsg(m, kind) { $('tipMsg').innerHTML = m; $('tipMsg').className = 'status' + (kind === 'err' ? ' err' : ''); $('tipMsg').style.color = kind === 'ok' ? 'var(--ok)' : ''; }
-// 金額（XRP）→ drops。不正なら null
-function tipDrops() {
-  const v = normNum(tipState.amt);
-  if (!v || !(Number(v) > 0) || Number(v) > 100000) return null;
-  const [ip, fp = ''] = v.split('.');
-  if (fp.length > 6) return null;
-  return (BigInt(ip) * 1000000n + BigInt((fp + '000000').slice(0, 6))).toString();
-}
-function renderTip() {
-  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.amt === tipState.amt));
-  document.querySelectorAll('.qtab').forEach(t => t.classList.toggle('on', t.dataset.mode === tipState.mode));
-  const useAmt = tipState.mode === 'amt' && QR_AMOUNTS.includes(tipState.amt);
-  const show = useAmt ? 'a' + tipState.amt : 'addr';
-  document.querySelectorAll('#tipCard svg.qr').forEach(q => { q.hidden = q.dataset.qr !== show; });
-  $('qrHelp').textContent = useAmt
-    ? `スマホのXamanで読み取ると、送金先と ${tipState.amt} XRP が入力された状態で開きます。`
-    : tipState.mode === 'amt'
-      ? '金額入りQRは 1・5・10 XRP のみ対応のため、アドレスのみのQRを表示しています。読み取ったあと金額を入力してください。'
-      : 'どのウォレット・取引所アプリでも読み取れる、アドレスだけのQRです。金額は送金画面で入力してください。';
-  $('tipXaman').hidden = !XAMAN_API_KEY;
-  const amtTxt = tipDrops() ? `${tipState.amt} XRP` : '金額';
-  $('mobileTip').textContent = XAMAN_API_KEY
-    ? `スマホの場合：「Xamanで送る」を押すと、${amtTxt}の送金リクエストがXamanアプリに届きます。その他のウォレットは、下の「アドレスをコピー」を押して送金画面に貼り付け、${amtTxt}を入力してください。`
-    : `スマホの場合：下の「アドレスをコピー」を押し、Xamanなどウォレットアプリの送金画面で宛先に貼り付けて、${amtTxt}を入力してください。`;
-}
-const txLink = h => h ? `<a href="https://xrpscan.com/tx/${esc(h)}" target="_blank" rel="noopener">取引を確認</a>` : '';
-const thanks = h => setTipMsg(`送金ありがとうございます！ ${txLink(h)}`, 'ok');
-async function withTipBusy(btn, fn) {
-  const drops = tipDrops();
-  if (!drops) { setTipMsg('金額を正しく入力してください（例：3 または 2.5）', 'err'); return; }
-  const label = btn.textContent; btn.disabled = true; btn.textContent = '確認中…';
-  try { await fn(drops); }
-  catch (e) { setTipMsg('エラー：' + esc(e.message || String(e)), 'err'); }
-  finally { btn.disabled = false; btn.textContent = label; }
-}
-// 拡張機能のSDKは押したときだけ読み込む
-async function loadModule(url, what) {
-  try { return await import(url); }
-  catch (e) { throw new Error(`${what}の接続用プログラムを読み込めませんでした（通信がブロックされている可能性）`); }
-}
-$('tipGem').addEventListener('click', e => withTipBusy(e.currentTarget, async drops => {
-  const gem = await loadModule('https://cdn.jsdelivr.net/npm/@gemwallet/api@3/+esm', 'GemWallet');
-  setTipMsg('GemWalletを確認しています…');
-  const inst = await gem.isInstalled().catch(() => null);
-  if (!inst || !inst.result || !inst.result.isInstalled) {
-    setTipMsg('GemWalletが見つかりません。PCのChrome等に<a href="https://gemwallet.app/" target="_blank" rel="noopener">GemWallet</a>をインストールしてから押してください。', 'err'); return;
-  }
-  setTipMsg('GemWalletの画面で内容を確認して承認してください。');
-  const m = tipMemo();
-  const r = await gem.sendPayment({ amount: drops, destination: TIP_ADDR, memos: [{ memo: { memoType: m.type, memoData: m.data } }] });
-  if (!r || r.type === 'reject' || !r.result) { setTipMsg('送金はキャンセルされました。'); return; }
-  thanks(r.result.hash);
-}));
-$('tipCross').addEventListener('click', e => withTipBusy(e.currentTarget, async drops => {
-  const mod = await loadModule('https://cdn.jsdelivr.net/npm/@crossmarkio/sdk/+esm', 'Crossmark');
-  const sdk = mod.default || mod.sdk || mod;
-  let installed = !!(window.crossmark || (window.xrpl && window.xrpl.crossmark));
-  try { installed = installed || !!(sdk.sync && sdk.sync.isInstalled && sdk.sync.isInstalled()); } catch (err) {}
-  if (!installed) {
-    setTipMsg('Crossmarkが見つかりません。PCのChrome等に<a href="https://crossmark.io/" target="_blank" rel="noopener">Crossmark</a>をインストールしてから押してください。', 'err'); return;
-  }
-  setTipMsg('Crossmarkの画面でサインインし、送金内容を確認して承認してください。');
-  const si = await sdk.methods.signInAndWait();
-  const address = si && si.response && si.response.data && si.response.data.address;
-  if (!address) { setTipMsg('サインインがキャンセルされました。'); return; }
-  const m = tipMemo();
-  const r = await sdk.methods.signAndSubmitAndWait({
-    TransactionType: 'Payment', Account: address, Destination: TIP_ADDR, Amount: drops,
-    Memos: [{ Memo: { MemoType: m.type, MemoData: m.data } }]
-  });
-  const d = r && r.response && r.response.data;
-  if (!d || (d.meta && (d.meta.isRejected || d.meta.isError))) { setTipMsg('送金はキャンセルされました。'); return; }
-  const res = d.resp && (d.resp.result || d.resp);
-  const code = res && (res.meta && res.meta.TransactionResult || res.engine_result);
-  if (code && code !== 'tesSUCCESS') { setTipMsg('送金が完了しませんでした（' + esc(code) + '）', 'err'); return; }
-  thanks(res && (res.hash || (res.tx_json && res.tx_json.hash)));
-}));
-// Xaman（APIキー設定時のみ）：初回はXamanでサインイン → 送金リクエストがXamanに届く
-let xumm = null;
-$('tipXaman').addEventListener('click', e => withTipBusy(e.currentTarget, async drops => {
-  if (!window.Xumm) {
-    await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://xumm.app/assets/cdn/xumm.min.js'; sc.onload = res; sc.onerror = () => rej(new Error('Xamanの接続用プログラムを読み込めませんでした')); document.head.appendChild(sc); });
-  }
-  xumm = xumm || new window.Xumm(XAMAN_API_KEY);
-  const acct = await xumm.user.account.catch(() => null);
-  if (!acct) {
-    setTipMsg('Xamanでサインインしてください。サインイン後、もう一度「Xamanで送る」を押すと送金リクエストが届きます。');
-    await xumm.authorize();
-    return;
-  }
-  const m = tipMemo();
-  const p = await xumm.payload.create({ TransactionType: 'Payment', Destination: TIP_ADDR, Amount: drops, Memos: [{ Memo: { MemoType: m.type, MemoData: m.data } }] });
-  if (!p) throw new Error('送金リクエストを作成できませんでした');
-  if (p.pushed) setTipMsg('Xamanアプリに送金リクエストを送りました。アプリで内容を確認して承認してください。');
-  else { setTipMsg(`Xamanで承認してください。開かない場合は<a href="${esc(p.next.always)}" target="_blank" rel="noopener">こちら</a>。`); window.open(p.next.always, '_blank'); }
-}));
-document.querySelector('.tip-amt').addEventListener('click', e => {
-  const c = e.target.closest('.chip'); if (!c) return;
-  tipState.amt = c.dataset.amt; $('tipOther').value = ''; renderTip();
-});
-$('tipOther').addEventListener('input', () => {
-  const raw = $('tipOther').value.trim(), v = normNum(raw);
-  tipState.amt = raw === '' ? '5' : (v || 'invalid'); // 空欄なら既定の5 XRPに戻す
-  renderTip();
-});
-document.querySelector('.qrtabs').addEventListener('click', e => {
-  const t = e.target.closest('.qtab'); if (!t) return;
-  tipState.mode = t.dataset.mode; renderTip();
-});
-// スマホ（タッチ操作のみの端末）では拡張機能ウォレットのボタンを隠す
-if (matchMedia('(pointer: coarse)').matches && !matchMedia('(hover: hover)').matches) document.body.classList.add('is-mobile');
-renderTip();
-
 $('copyTip').addEventListener('click', async () => {
   const v = $('tipAddr').textContent.trim();
   try { await navigator.clipboard.writeText(v); }
