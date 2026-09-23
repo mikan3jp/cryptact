@@ -214,7 +214,7 @@ button:disabled{cursor:not-allowed}
         <li>AMM流動性提供: クリプタクトの案内どおり、預入時は出力せず、引出時に預入量との差分をBONUS（増えた分）/LOSS（減った分）で出力します。一部引出はLPトークンの比率で按分します。預入が取得範囲より前にある場合は差分が計算できないため出力しません（「口座開設から」で取得し直してください）。</li>
         <li>表で入力した価格・種類、トークン名、既定の単価は、このブラウザにアドレスごとに保存され、次回取得時に自動で復元されます（外部には送信しません）。</li>
         <li>NFT: 購入=BUY、売却=SELL、ミント=手数料を取得価額としたBUY。名称は USER-NFT-発行者-連番 です。</li>
-        <li>単純な送受金は既定で除外（自己送金とみなす）。トークン・NFTの受取は既定でBONUS。表の「種類」から1件ずつ変更できます。</li>
+        <li>単純な送受金は既定で除外（自己送金とみなす）。トークン・NFTの受取は既定でBONUS。表の「種類」のドロップダウンから、クリプタクトのカスタムファイルで使える全21種類（BUY・SELL・PAY・TIP・BONUS・STAKING・LENDING・MINING・LEND・RECOVER・BORROW・RETURN・SENDFEE・DEFIFEE・LOSS・EXPENSE・REDUCE・LEVELUP・MARGINGAIN・MARGINLOSS・CASH）または「出力しない」に1件ずつ変更できます（★が自動判定）。BUY・SELL以外に変えると決済通貨はJPYになり、LOSS・REDUCEなど価格を空欄にする種類では価格欄が消えます。</li>
         <li>「円単価を自動推定」：価格が未入力の行を「その時点のトークンのXRP建て価格 × その日のXRP/円終値」で埋めます。XRP建て価格は、取引時点のレジャーのAMMプール比率 → 板の仲値 → 30日以内の自分のXRP建て取引の順に探します。XRP/円はbitbankの日足終値を使い、取得できない日はCoinGecko（直近365日）、Binance XRP/USDT×Frankfurter 米ドル/円の順で補います。推定の根拠はCSVのコメント欄に残ります。あくまで推定値なので、大きな金額の行は確認してください。</li>
         <li>クリプタクトへのアップ：カスタムファイルを追加でアップすると、すでに取り込まれた最新の日時より後の取引しか取り込まれません（クリプタクトの二重計上防止の仕様）。複数の期間に分けて出力した場合は古い期間から順にアップし、修正版をアップし直すときは前回アップ分をクリプタクト上で削除してから行ってください。</li>
         <li>カスタムコインのBONUS・SELL等は時価がクリプタクトに無いため、価格欄にJPY建ての1枚あたり価格を入力してください（空欄だと「価格データ欠落」になります）。</li>
@@ -407,15 +407,37 @@ function nftName(id) { return `USER-NFT-${id.slice(8, 14)}-${parseInt(id.slice(5
 function isCustom(name) { return /^USER-/i.test(name); }
 
 // ===================== 分類 =====================
-const IN_CHOICES = ['EXCLUDE', 'BONUS'];
-const OUT_CHOICES = ['EXCLUDE', 'TIP', 'PAY', 'REDUCE', 'LOSS'];
-const PRICE_ACTIONS = ['BONUS', 'BUY', 'SELL', 'TIP', 'PAY'];
-const NO_PRICE_ACTIONS = ['SENDFEE', 'DEFIFEE', 'LOSS', 'REDUCE'];
+// クリプタクトのカスタムファイルで使える取引種類（公式ヘルプ「取引種類別の計算方法」「カスタムファイルの作成方法」より）
+const ACTIONS = [
+  ['BUY', '買い'], ['SELL', '売り'], ['PAY', '支払い'], ['TIP', 'チップ'],
+  ['BONUS', 'ボーナス・エアドロップ'], ['STAKING', 'ステーキング報酬'], ['LENDING', '貸しコイン収入'], ['MINING', 'マイニング報酬'],
+  ['LEND', '貸コイン'], ['RECOVER', '貸コイン回収'], ['BORROW', '借コイン'], ['RETURN', '借コイン返却'],
+  ['SENDFEE', '送金手数料'], ['DEFIFEE', 'DeFi手数料・費用計上'], ['LOSS', '損失'], ['EXPENSE', '費用'], ['REDUCE', '在庫減少・損益なし'],
+  ['LEVELUP', 'レベルアップ'], ['MARGINGAIN', '証拠金の増加'], ['MARGINLOSS', '証拠金の減少'], ['CASH', '現金調整']
+];
+const ALL_CHOICES = ['EXCLUDE', ...ACTIONS.map(a => a[0])];
+const IN_CHOICES = ALL_CHOICES, OUT_CHOICES = ALL_CHOICES;
+// 時価で損益が出るため、カスタムコインは円単価が必要な種類
+const PRICE_ACTIONS = ['BUY', 'SELL', 'PAY', 'TIP', 'BONUS', 'STAKING', 'LENDING', 'MINING', 'BORROW', 'RETURN', 'MARGINGAIN', 'CASH'];
+// 価格は必ず空欄にする種類
+const NO_PRICE_ACTIONS = ['SENDFEE', 'DEFIFEE', 'LOSS', 'EXPENSE', 'REDUCE', 'MARGINLOSS'];
+// 決済通貨に仮想通貨を使える種類（それ以外は法定通貨 JPY のみ）
+const ANY_COUNTER_ACTIONS = ['BUY', 'SELL'];
+// 種類ごとの注意（選んだときに表示）
+const ACTION_NOTES = {
+  LEND: '貸コインと回収（RECOVER）はソース名を一致させてください',
+  RECOVER: '貸コイン（LEND）とソース名を一致させてください',
+  BORROW: '借コインと返却（RETURN）はソース名と数量を一致させてください',
+  RETURN: '借コイン（BORROW）とソース名と数量を一致させてください',
+  LEVELUP: 'NFTの取得価額に上乗せする処理です。価格の入れ方はクリプタクトのヘルプを確認してください',
+  CASH: '現金調整：価格欄に円の金額を入力（費用はプラス、収入はマイナス）。主軸通貨はJPYで出力します',
+  MARGINGAIN: 'デリバティブ取引の証拠金の増加です', MARGINLOSS: 'デリバティブ取引の証拠金の減少です'
+};
 const TRADE_TYPES = ['OfferCreate', 'AMMDeposit', 'AMMWithdraw', 'AMMCreate', 'AMMBid', 'AMMClawback', 'NFTokenMint', 'NFTokenAcceptOffer', 'NFTokenCreateOffer'];
 
 // 価格が必要なのに空欄の行か（法定通貨建て以外で空欄はクリプタクトでエラーになる）
 function updateNeedsPrice(r) {
-  r.needsPrice = r.priceEditable && PRICE_ACTIONS.includes(r.action) && r.price === '' && (r.counter !== 'JPY' || isCustom(r.base));
+  r.needsPrice = r.priceEditable && PRICE_ACTIONS.includes(r.action) && r.price === '' && (r.action === 'CASH' || r.counter !== 'JPY' || isCustom(r.base));
   return r;
 }
 
@@ -436,16 +458,21 @@ function classifyAll(list, ctx) {
         id, time: a.time, hash: a.hash, txType: a.type,
         source: o.source || ctx.source, action: o.action, base: o.base || '', volume: o.vol ?? 0n,
         price: o.price ?? '', counter: o.counter || 'JPY', label: o.label || '', flag: o.flag || '',
-        choices: o.choices || null, priceEditable: false,
+        choices: o.action === 'INFO' ? null : ALL_CHOICES, priceEditable: false,
         ledger: a.ledger, asset: o.asset || null, group: o.group || null
       };
       const e = ctx.edits.get(id);
-      if (e) {
-        if (e.action && r.choices && r.choices.includes(e.action)) r.action = e.action;
-        if (e.price !== undefined) r.price = e.price;
+      r.defaultAction = r.action;
+      if (e && e.action && r.choices && r.choices.includes(e.action) && e.action !== r.action) {
+        r.action = e.action;
+        // 決済通貨の制約：BUY/SELL以外は法定通貨のみ → 仮想通貨建ての価格は使えないので空欄に
+        if (!ANY_COUNTER_ACTIONS.includes(r.action) && r.counter !== 'JPY') { r.counter = 'JPY'; r.price = ''; }
+        if (ACTION_NOTES[r.action]) r.flag = ACTION_NOTES[r.action];
       }
+      if (e && e.price !== undefined) r.price = e.price;
       r.priceEditable = r.action !== 'INFO' && r.action !== 'EXCLUDE' && !NO_PRICE_ACTIONS.includes(r.action);
       if (!r.priceEditable && NO_PRICE_ACTIONS.includes(r.action)) r.price = '';
+      if (r.action === 'CASH') { r.priceDefault = false; r.priceEst = false; r.estNote = ''; updateNeedsPrice(r); rows.push(r); return r; }
       // 未入力なら、トークンごとの既定単価（円）を使う
       // 優先順位：手入力 ＞ トークンの既定単価 ＞ 自動推定
       r.priceDefault = false; r.priceEst = false; r.estNote = '';
@@ -470,14 +497,14 @@ function classifyAll(list, ctx) {
         if (own) { def = 'EXCLUDE'; label += '（自己アドレス）'; }
         if ((a.type === 'EscrowFinish' || a.type === 'EscrowCancel') && a.owner === ctx.me) { def = 'EXCLUDE'; label = `エスクロー戻り ${desc(c)}`; }
         if (a.type === 'PaymentChannelClaim' && a.sender === ctx.me && a.owner === undefined) { /* 自分のチャネル精算 */ }
-        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, choices: IN_CHOICES, flag, rk: 'io:' + c.asset.key, asset: c.asset });
+        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, flag, rk: 'io:' + c.asset.key, asset: c.asset });
       } else {
         let label = `送付 ${desc(c)}` + (cp && cp !== ctx.me ? ` → ${short(cp)}` : '');
         if (own) label += '（自己アドレス）';
         if (a.type === 'EscrowCreate') label = `エスクロー作成（自己資産のロック） ${desc(c)}`;
         let def = 'EXCLUDE';
         if (a.type === 'NFTokenBurn') { def = 'REDUCE'; label = `NFTバーン ${desc(c)}`; }
-        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, choices: OUT_CHOICES, flag, rk: 'io:' + c.asset.key, asset: c.asset });
+        push({ action: def, base: name, vol: abs(c.delta), counter: 'JPY', label, flag, rk: 'io:' + c.asset.key, asset: c.asset });
       }
     };
 
@@ -549,8 +576,8 @@ function classifyAll(list, ctx) {
         for (const d of diffs) {
           if (d.diff === 0n) continue;
           const n = nameOf(d.asset);
-          if (d.diff > 0n) push({ action: noRecord ? 'EXCLUDE' : 'BONUS', base: n, vol: d.diff, counter: 'JPY', source: src, label: noRecord ? `AMM引出の受取 ${pName}` : `AMM引出の差益 ${pName}`, flag, choices: ['BONUS', 'EXCLUDE'], rk: 'amm:' + d.asset.key, asset: d.asset });
-          else push({ action: 'LOSS', base: n, vol: -d.diff, counter: 'JPY', source: src, label: `AMM引出の差損 ${pName}`, flag, choices: ['LOSS', 'REDUCE', 'EXCLUDE'], rk: 'amm:' + d.asset.key, asset: d.asset });
+          if (d.diff > 0n) push({ action: noRecord ? 'EXCLUDE' : 'BONUS', base: n, vol: d.diff, counter: 'JPY', source: src, label: noRecord ? `AMM引出の受取 ${pName}` : `AMM引出の差益 ${pName}`, flag, rk: 'amm:' + d.asset.key, asset: d.asset });
+          else push({ action: 'LOSS', base: n, vol: -d.diff, counter: 'JPY', source: src, label: `AMM引出の差損 ${pName}`, flag, rk: 'amm:' + d.asset.key, asset: d.asset });
         }
       } else {
         transfer(l, 'LPトークンの移動（要確認）');
@@ -618,12 +645,16 @@ function tsStr(ms, tz) {
   return `${d.getUTCFullYear()}/${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
 }
 function yearOf(ms, tz) { return new Date(ms + (tz === 'JST' ? 9 * 3600e3 : 0)).getUTCFullYear(); }
-function isExport(r) { return r.action !== 'INFO' && r.action !== 'EXCLUDE' && fmt(r.volume) !== '0'; }
+function isExport(r) { return r.action !== 'INFO' && r.action !== 'EXCLUDE' && (r.action === 'CASH' || fmt(r.volume) !== '0'); }
 function cell(s) { return String(s).replace(/[,'"\\\r\n]/g, ' ').trim(); }
 function toCSV(rows, tz) {
   const out = ['Timestamp,Action,Source,Base,Volume,Price,Counter,Fee,FeeCcy,Comment'];
   for (const r of rows) {
     if (!isExport(r)) continue;
+    if (r.action === 'CASH') { // 現金調整：主軸通貨JPY・取引量0・価格0・手数料欄に円の金額
+      out.push([tsStr(r.time, tz), 'CASH', r.source, 'JPY', '0', '0', 'JPY', r.price || '0', 'JPY', `${r.txType} ${r.label} 元:${fmt(r.volume)} ${r.base} ${r.hash}`].map(cell).join(','));
+      continue;
+    }
     out.push([tsStr(r.time, tz), r.action, r.source, r.base, fmt(r.volume), r.price, r.counter, '0', 'JPY',
       `${r.txType} ${r.label}${r.priceEst ? ' 推定単価 ' + r.estNote : ''} ${r.hash}`].map(cell).join(','));
   }
@@ -901,7 +932,7 @@ function recompute() {
   render();
 }
 
-const ACTION_JA = { EXCLUDE: '除外', BONUS: 'BONUS', TIP: 'TIP（贈与）', PAY: 'PAY（支払）', REDUCE: 'REDUCE（枚数のみ減）', LOSS: 'LOSS（損失）' };
+const ACTION_JA = Object.assign({ EXCLUDE: '出力しない' }, Object.fromEntries(ACTIONS.map(([k, v]) => [k, `${k}（${v}）`])));
 
 function render() {
   $('resultCard').classList.remove('hidden');
@@ -926,7 +957,7 @@ function render() {
   $('rows').innerHTML = slice.map(r => {
     const cls = r.action === 'INFO' ? 'info' : r.action === 'EXCLUDE' ? 'excl' : '';
     const act = r.choices
-      ? `<select data-id="${esc(r.id)}" data-f="action">${r.choices.map(c => `<option value="${c}"${c === r.action ? ' selected' : ''}>${ACTION_JA[c] || c}</option>`).join('')}</select>`
+      ? `<select data-id="${esc(r.id)}" data-f="action">${r.choices.map(c => `<option value="${c}"${c === r.action ? ' selected' : ''}>${ACTION_JA[c] || c}${c === r.defaultAction ? ' ★自動判定' : ''}</option>`).join('')}</select>`
       : (r.action === 'INFO' ? '—' : r.action);
     const price = r.priceEditable
       ? `<input class="price" data-id="${esc(r.id)}" data-f="price" value="${esc(r.price)}" placeholder="${pricePlaceholder(r)}" inputmode="decimal">`
@@ -941,7 +972,7 @@ function render() {
   $('coinCount').textContent = coins.length;
   $('coinList').value = coins.join('\n');
 }
-function pricePlaceholder(r) { return r.needsPrice ? (r.counter === 'JPY' ? '円単価を入力' : r.counter + '建て単価') : '空欄=自動'; }
+function pricePlaceholder(r) { if (r.action === 'CASH') return '円の金額（収入は−）'; return r.needsPrice ? (r.counter === 'JPY' ? '円単価を入力' : r.counter + '建て単価') : '空欄=自動'; }
 function badgesOf(r) {
   return (r.needsPrice ? '<span class="badge b-warn">価格入力</span>' : '') +
     (r.priceDefault ? '<span class="badge b-ok">既定の単価</span>' : '') +
@@ -1118,7 +1149,7 @@ async function estimatePrices() {
   if (!requireAgree()) return;
   const setE = (m, err) => { $('estStatus').textContent = m; $('estStatus').className = 'status' + (err ? ' err' : ''); };
   // 対象：期間内で価格が未入力（または前回推定）のJPY建て行。ペア（トークン同士の交換など）は相手の行も含める
-  const vis = visibleRows().filter(r => isExport(r) && r.counter === 'JPY' && r.priceEditable && (r.needsPrice || r.priceEst));
+  const vis = visibleRows().filter(r => isExport(r) && r.action !== 'CASH' && r.counter === 'JPY' && r.priceEditable && (r.needsPrice || r.priceEst));
   if (!vis.length) { setE('推定が必要な行はありません（価格が未入力の行が対象です）'); return; }
   const groups = new Map();
   for (const r of vis) {
@@ -1288,8 +1319,11 @@ $('rows').addEventListener('change', e => {
   const t = e.target, id = t.dataset.id, f = t.dataset.f; if (!id) return;
   const ed = state.edits.get(id) || {};
   if (f === 'price') {
-    const v = normNum(t.value);
     const r = state.rows.find(x => x.id === id);
+    // 現金調整（CASH）は収入をマイナスで入れるので負の数も可
+    const neg = r && r.action === 'CASH' && /^\s*[-－−]/.test(t.value);
+    let v = normNum(String(t.value).replace(/^\s*[-－−]/, ''));
+    if (v && neg) v = '-' + v;
     if (v === null) { t.value = r ? r.price : ''; alert('数字で入力してください（例: 12.5）'); return; }
     if (v === '') delete ed.price; else ed.price = v;
     if (Object.keys(ed).length) state.edits.set(id, ed); else state.edits.delete(id);
