@@ -78,22 +78,26 @@ details summary{cursor:pointer;font-weight:600}
           <option value="custom">カスタム…</option>
         </select>
       </div>
-      <button id="fetchBtn">取得</button>
     </div>
     <input id="customServer" class="hidden" style="margin-top:10px" placeholder="wss://...">
+    <div class="row" style="margin-top:12px">
+      <div style="flex:1 1 160px"><label for="year">対象期間</label><select id="year"></select></div>
+      <div class="rangeBox hidden" style="flex:1 1 150px"><label for="dateFrom">開始日</label><input type="date" id="dateFrom"></div>
+      <div class="rangeBox hidden" style="flex:1 1 150px"><label for="dateTo">終了日（この日を含む）</label><input type="date" id="dateTo"></div>
+      <div style="flex:1 1 240px"><label for="scope">取得する範囲</label>
+        <select id="scope">
+          <option value="period">対象期間の取引だけ（速い）</option>
+          <option value="history">口座開設から終了日まで（AMMの差損益が正確）</option>
+        </select></div>
+      <button id="fetchBtn">取得</button>
+    </div>
+    <p class="muted" id="scopeNote" style="margin:8px 0 0">AMMの流動性提供を対象期間より前に始めている場合は「口座開設から」を選んでください。預け入れ時の数量がないと引き出し時の差損益を計算できません。</p>
     <div id="status" class="status"></div>
   </section>
 
   <section class="card">
     <h2>変換設定</h2>
     <div class="grid">
-      <div><label for="year">対象期間</label><select id="year"><option value="all">全期間</option><option value="custom">期間を指定…</option></select></div>
-      <div id="rangeBox" class="hidden" style="grid-column:1/-1">
-        <div class="row">
-          <div style="flex:1 1 160px"><label for="dateFrom">開始日</label><input type="date" id="dateFrom"></div>
-          <div style="flex:1 1 160px"><label for="dateTo">終了日（この日を含む）</label><input type="date" id="dateTo"></div>
-        </div>
-      </div>
       <div><label for="tz">日時のタイムゾーン</label><select id="tz"><option value="JST">日本時間（JST）</option><option value="UTC">UTC</option></select></div>
       <div><label for="source">ソース名</label><input id="source" value="XRPL"></div>
       <div><label for="feeMode">ネットワーク手数料</label>
@@ -124,6 +128,7 @@ details summary{cursor:pointer;font-weight:600}
 
   <section class="card hidden" id="resultCard">
     <h2>変換結果</h2>
+    <p id="rangeWarn" class="status err hidden" style="margin:0 0 10px">選んだ期間は、取得済みの範囲からはみ出しています。「取得」を押し直してください。</p>
     <div class="stats" id="stats"></div>
     <div class="filters">
       <select id="filter">
@@ -596,16 +601,34 @@ async function run() {
   try {
     setStatus('接続中… ' + url);
     await client.connect();
+    // 期間 → レジャー番号の範囲に変換して、その範囲だけ取得する
+    const range = periodRange();
+    const scope = $('scope').value;
+    let lmin = -1, lmax = -1;
+    if (range.from != null || range.to != null) {
+      setStatus('期間に対応するレジャーを検索中…');
+      const finder = await ledgerFinder(client);
+      if (range.to != null) {
+        const n = await finder(range.to);
+        if (n != null) lmax = n - 1;
+      }
+      if (range.from != null && scope === 'period') {
+        const n = await finder(range.from);
+        if (n != null) lmin = n;
+      }
+      if (lmin !== -1 && lmax !== -1 && lmin > lmax) lmax = lmin; // 期間内にレジャーが無い場合でも空で返る
+    }
     const txs = [];
     let marker, first = true, minLedger = null;
     do {
-      const r = await withRetry(() => client.request({ command: 'account_tx', account: me, ledger_index_min: -1, ledger_index_max: -1, forward: true, limit: 400, marker, api_version: 1 }));
+      const r = await withRetry(() => client.request({ command: 'account_tx', account: me, ledger_index_min: lmin, ledger_index_max: lmax, forward: true, limit: 400, marker, api_version: 1 }));
       if (first) { minLedger = r.ledger_index_min; first = false; }
       txs.push(...(r.transactions || []));
       marker = r.marker;
       setStatus(`取得中… ${txs.length}件`);
     } while (marker);
 
+    state.fetched = { from: lmin === -1 ? null : range.from, to: lmax === -1 ? null : range.to, tz: $('tz').value };
     state.me = me;
     state.assets = new Map(); state.pools = new Map(); state.edits = new Map();
     const reg = a => { let x = state.assets.get(a.key); if (!x) { x = Object.assign(a, { count: 0 }); state.assets.set(a.key, x); } x.count++; return x; };
@@ -624,9 +647,9 @@ async function run() {
 
     state.names = defaultNames(state.assets, state.pools);
     let msg = `完了：${txs.length}件のトランザクションを取得しました。`;
-    if (minLedger && minLedger > 32570) msg += `（注意：このノードは ledger ${minLedger} 以降の履歴のみ保持。全履歴ノードで再取得を推奨）`;
-    setStatus(msg, minLedger && minLedger > 32570);
-    fillYears();
+    const partial = lmin === -1 && minLedger && minLedger > 32570;
+    if (partial) msg += `（注意：このノードは ledger ${minLedger} 以降の履歴のみ保持。全履歴ノードで再取得を推奨）`;
+    setStatus(msg, partial);
     renderMap();
     recompute();
   } catch (e) {
@@ -637,12 +660,63 @@ async function run() {
   }
 }
 
+// 期間の選択肢（取得前から選べるよう固定で並べる。XRPLは2012年開始）
 function fillYears() {
-  const tz = $('tz').value;
-  const years = [...new Set(state.analyzed.map(a => yearOf(a.time, tz)))].sort((x, y) => y - x);
-  const cur = $('year').value;
-  $('year').innerHTML = '<option value="all">全期間</option>' + years.map(y => `<option value="${y}">${y}年</option>`).join('') + '<option value="custom">期間を指定…</option>';
-  if ([...$('year').options].some(o => o.value === cur)) $('year').value = cur;
+  const now = new Date().getFullYear();
+  let h = '';
+  for (let y = now; y >= 2012; y--) h += `<option value="${y}">${y}年</option>`;
+  $('year').innerHTML = h + '<option value="all">全期間</option><option value="custom">期間を指定…</option>';
+  $('year').value = String(now - 1); // 確定申告の対象になる前年を既定に
+}
+
+// 日時の境目（ms）を返す。to は含まない
+function periodRange() {
+  const y = $('year').value, off = $('tz').value === 'JST' ? 9 * 3600e3 : 0;
+  const day = s => Date.parse(s + 'T00:00:00Z') - off;
+  if (y === 'all') return { from: null, to: null };
+  if (y === 'custom') {
+    const f = $('dateFrom').value, t = $('dateTo').value;
+    return { from: f ? day(f) : null, to: t ? day(t) + 86400e3 : null };
+  }
+  return { from: day(`${y}-01-01`), to: day(`${+y + 1}-01-01`) };
+}
+
+// 指定時刻以降に閉じた最初のレジャー番号を二分探索で求める（未来なら null）
+async function ledgerFinder(client) {
+  const cache = new Map();
+  const closeOf = async n => {
+    if (!cache.has(n)) {
+      const r = await withRetry(() => client.request({ command: 'ledger', ledger_index: n }));
+      cache.set(n, Number(r.ledger.close_time));
+    }
+    return cache.get(n);
+  };
+  const info = await withRetry(() => client.request({ command: 'server_info' }));
+  const complete = String(info.info.complete_ledgers || '');
+  const first = parseInt(complete, 10) || 32570;
+  const v = await withRetry(() => client.request({ command: 'ledger', ledger_index: 'validated' }));
+  const last = Number(v.ledger.ledger_index);
+  cache.set(last, Number(v.ledger.close_time));
+  return async ms => {
+    const target = Math.floor(ms / 1000) - RIPPLE_EPOCH;
+    if (target > await closeOf(last)) return null;
+    if (target <= await closeOf(first)) return first;
+    let lo = first, hi = last; // close(lo) < target <= close(hi)
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (await closeOf(mid) >= target) hi = mid; else lo = mid;
+    }
+    return hi;
+  };
+}
+
+// 選んだ期間が取得済みの範囲に収まっているか
+function coveredByFetch() {
+  const f = state.fetched; if (!f) return true;
+  const r = periodRange();
+  if (f.from != null && (r.from == null || r.from < f.from)) return false;
+  if (f.to != null && (r.to == null || r.to > f.to)) return false;
+  return true;
 }
 
 function renderMap() {
@@ -667,14 +741,8 @@ function ctx() {
 
 // 選択中の期間に入るか（時刻msで判定）
 function inPeriod(ms) {
-  const y = $('year').value, tz = $('tz').value;
-  if (y === 'all') return true;
-  if (y !== 'custom') return String(yearOf(ms, tz)) === y;
-  const off = tz === 'JST' ? 9 * 3600e3 : 0;
-  const f = $('dateFrom').value, t = $('dateTo').value;
-  if (f && ms < Date.parse(f + 'T00:00:00Z') - off) return false;
-  if (t && ms >= Date.parse(t + 'T00:00:00Z') + 86400e3 - off) return false;
-  return true;
+  const r = periodRange();
+  return (r.from == null || ms >= r.from) && (r.to == null || ms < r.to);
 }
 function periodLabel() {
   const y = $('year').value;
@@ -697,6 +765,7 @@ function render() {
   const exp = rows.filter(isExport);
   const needP = exp.filter(r => r.needsPrice).length;
   const flagged = rows.filter(r => r.flag && r.action !== 'EXCLUDE').length;
+  $('rangeWarn').classList.toggle('hidden', coveredByFetch());
   $('stats').innerHTML = [
     ['トランザクション', state.analyzed.filter(a => inPeriod(a.time)).length],
     ['出力行', exp.length],
@@ -742,12 +811,15 @@ $('fetchBtn').addEventListener('click', run);
 $('addr').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
 $('server').addEventListener('change', () => $('customServer').classList.toggle('hidden', $('server').value !== 'custom'));
 ['feeMode', 'xrpIn', 'tokenIn', 'own', 'source'].forEach(id => $(id).addEventListener('change', recompute));
-$('tz').addEventListener('change', () => { if (state.me) { fillYears(); render(); } });
+$('tz').addEventListener('change', () => { if (state.me) render(); });
 function onPeriodChange() {
-  $('rangeBox').classList.toggle('hidden', $('year').value !== 'custom');
+  document.querySelectorAll('.rangeBox').forEach(el => el.classList.toggle('hidden', $('year').value !== 'custom'));
+  $('scope').disabled = $('year').value === 'all';
   state.shown = 300;
   if (state.me) render();
 }
+fillYears();
+onPeriodChange();
 $('year').addEventListener('change', onPeriodChange);
 ['dateFrom', 'dateTo'].forEach(id => $(id).addEventListener('change', onPeriodChange));
 $('filter').addEventListener('change', () => { state.shown = 300; render(); });
